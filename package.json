@@ -1,0 +1,83 @@
+{
+	"name": "vsgenstat",
+	"displayName": "VSGenStat",
+	"description": "GenStat extension for Visual Studio Code",
+	"version": "0.0.1",
+	"publisher": "Johannes Kruisselbrink",
+	"engines": {
+		"vscode": "^1.31.0"
+	},
+	"keywords": [
+		"GenStat"
+	],
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:extension.runGenStat",
+		"onCommand:extension.createTerminal"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"languages": [
+			{
+				"id": "genstat",
+				"extensions": [
+					".gen"
+				],
+				"aliases": [
+					"gen",
+					"Gen"
+				]
+			}
+		],
+		"commands": [
+			{
+				"command": "extension.runGenStat",
+				"title": "Genstat: Run GenStat"
+			},
+			{
+				"command": "extension.createTerminal",
+				"title": "GenStat: create terminal"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "extension.runGenStat",
+				"key": "Ctrl+F5",
+				"when": "editorTextFocus && editorLangId == genstat"
+			}
+		],
+		"configuration": {
+			"type": "object",
+			"title": "GenStat",
+			"properties": {
+				"path.genbatch": {
+					"type": "string",
+					"default": "C:/Program Files/R/R-3.3.0/bin/Rscript.exe",
+					"description": "Path to GenBatch.exe"
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "npm run compile && node ./node_modules/vscode/bin/test"
+	},
+	"devDependencies": {
+		"typescript": "^3.3.1",
+		"vscode": "^1.1.28",
+		"tslint": "^5.12.1",
+		"@types/node": "^10.12.21",
+		"@types/mocha": "^2.2.42",
+		"@types/fs-extra": "^5.0.1",
+		"@types/trash": "^4.3.0"
+	},
+	"dependencies": {
+		"fs-extra": "^7.0.0",
+		"trash": "^4.3.0"
+	}
+}
