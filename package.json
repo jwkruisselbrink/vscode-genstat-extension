@@ -22,13 +22,18 @@
 		"languages": [
 			{
 				"id": "genstat",
-				"extensions": [
-					".gen"
-				],
+				"extensions": [ ".gen" ],
 				"aliases": [
 					"gen",
 					"Gen"
 				]
+			}
+		],
+		"grammars": [
+			{
+				"language": "genstat",
+				"scopeName": "source.gen",
+				"path": "./syntaxes/genstat.syntax.json"
 			}
 		],
 		"commands": [

@@ -1,0 +1,128 @@
+{
+	"scopeName": "source.gen",
+	"patterns": [{ "include": "#expression" }],
+	"repository": {
+		"expression": {
+			"patterns": [
+				{ "include": "#keywords" },
+				{ "include": "#strings" },
+				{ "include": "#constants" },
+				{ "include": "#comments" },
+				{ "include": "#paren-expression" }
+			]
+		},
+		"keywords":{
+			"patterns": [
+				{
+					"name": "keyword.control.gen",
+					"match": "\\b(for|endfor|if|endif)\\b"
+				},
+				{
+					"name": "keyword.control.gen",
+					"match": "\\b(else|elsif)\\b"
+				},
+				{
+					"name": "keyword.operator.other.gen",
+					"match": "(;|=)"
+				},
+				{
+					"name": "keyword.other.gen",
+					"match": "^\\s*\\w*\\s"
+				}
+			]
+		},
+		"strings": {
+			"patterns": [
+				{
+					"begin": "'",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.begin.gen"
+						}
+					},
+					"end": "'",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.string.end.gen"
+						}
+					},
+					"name": "string.quoted.single.r",
+					"patterns": [
+						{
+							"match": "\\\\.",
+							"name": "constant.character.escape.r"
+						}
+					]
+				}
+			]
+		},
+		"constants": {
+			"patterns": [
+				{
+					"match": "\\b(TRUE|FALSE|NULL|NA|NA_integer_|NA_real_|NA_complex_|NA_character_|Inf|NaN)\\b",
+					"name": "constant.language.gen"
+				},
+				{
+					"match": "\\b(?:[0-9]+\\.?[0-9]*)L\\b",
+					"name": "constant.numeric.integer.decimal.gen"
+				},
+				{
+					"match": "\\b[0-9]+\\,?[0-9]*\\b",
+					"name": "constant.numeric.float.decimal.gen"
+				},
+				{
+					"match": "\\.[0-9]+?\\b",
+					"name": "constant.numeric.float.decimal.gen"
+				}
+			]
+		},
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.line.gen",
+					"begin": "\\\\",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.gen"
+						}
+					},
+					"end": "\\n"
+				},
+				{
+					"name": "comment.block.gen",
+					"begin": "\"",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.begin.gen"
+						}
+					},
+					"end": "\"|$",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.end.gen"
+						}
+					},
+					"patterns": [
+						{
+							"begin": "(?:\\G|^)(?=(?:[^\"])+$)",
+							"end": "$",
+							"name": "invalid.illegal.unclosed.string.gen"
+						}
+					]
+				}
+			]
+		},
+		"paren-expression": {
+			"begin": "\\(",
+			"end": "\\)",
+			"beginCaptures": {
+				"0": { "name": "punctuation.paren.open.gen" }
+			},
+			"endCaptures": {
+				"0": { "name": "punctuation.paren.close.gen" }
+			},
+			"name": "expression.group.gen",
+			"patterns": [{ "include": "#expression" }]
+		}
+	}
+}
