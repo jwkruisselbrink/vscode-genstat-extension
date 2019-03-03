@@ -35,22 +35,20 @@ export function activate(context: vscode.ExtensionContext) {
 			const wad = activeTextEditor.document;
 			wad.save();
 
-			GenStatOutputChannel.show();
 			GenStatOutputChannel.start(`Running GenStat file ${wad.fileName}`);
 
 			try {
 				await vscode.window.withProgress({
 					location: vscode.ProgressLocation.Window,
 					title: "Running GenStat...",
-				}, async (progress, token) => {
-					token.onCancellationRequested(() => {
-						console.log("User canceled the long running operation")
-					});
-					return await runGenStat(pathGenBatch, wad.fileName);
+				}, async () => {
+					await runGenStat(pathGenBatch, wad.fileName)
+						.then(filename => vscode.workspace.openTextDocument(filename))
+						.then(doc => vscode.window.showTextDocument(doc, (activeTextEditor.viewColumn as ViewColumn) + 1));
 				});
 				GenStatOutputChannel.end(`Run GenStat complete!`);
 			} catch (ex) {
-				GenStatOutputChannel.end(`Run GenStat failed: \n${ex.error}`);
+				GenStatOutputChannel.error(`Run GenStat failed: ${ex.message}!`);
 			}
 
 			delete status.compile;
@@ -58,56 +56,32 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('extension.createTerminal', () => {
-		vscode.window.showInformationMessage('Hello World 2!');
+		const activeTextEditor = vscode.window.activeTextEditor;
+		if (activeTextEditor) {
+			if (activeTextEditor.viewColumn) {
+				vscode.window.showInformationMessage('Hello World 2!');
+				return vscode.workspace.openTextDocument(activeTextEditor.document.fileName)
+					.then(doc => vscode.window.showTextDocument(doc, (activeTextEditor.viewColumn as ViewColumn) + 1));
+			}
+		}
 	}));
 
 }
 
-// this method is called when the extension is deactivated
+// method called when the extension is deactivated
 export function deactivate() {}
 
-async function runGenStat(pathGenBatch: string, filename: string): Promise<void> {
-
+async function runGenStat(pathGenBatch: string, filename: string): Promise<string> {
 	const extension = path.extname(filename);
 	const basename = path.basename(filename, extension);
 	const folder = path.dirname(filename);
-	const target = path.join(folder, basename + "_cp" + extension);
-	vscode.window.showInformationMessage(target);
-
-	var canWriteToTarget = await ensureWritableFile(target);
-	if (canWriteToTarget) {
+	const target = path.join(folder, basename + ".lis");
+	if (await ensureWritableFile(target)) {
 		await fsx.copy(filename, target);
-		openFileInEditor(target);
+		return target;
+	} else {
+		throw new Error(`Could not write to output file ${target}!`);
 	}
-}
-
-async function getSourcePath(): Promise<string> {
-	// Attempting to get the fileName from the activeTextEditor.
-	// Works for text files only.
-	const activeEditor = vscode.window.activeTextEditor;
-	if (activeEditor && activeEditor.document && activeEditor.document.fileName) {
-		return Promise.resolve(activeEditor.document.fileName);
-	}
-	throw new Error();
-}
-
-async function openFileInEditor(filename: string): Promise<TextEditor> {
-	const isDir = fs.statSync(filename).isDirectory();
-	if (isDir) {
-		throw new Error('Could not open file!');
-	}
-
-	const textDocument = await vscode.workspace.openTextDocument(filename);
-	if (!textDocument) {
-		throw new Error('Could not open file!');
-	}
-
-	const editor = await vscode.window.showTextDocument(textDocument, ViewColumn.Active);
-	if (!editor) {
-		throw new Error('Could not show document!');
-	}
-
-	return editor;
 }
 
 async function ensureWritableFile(filename: string): Promise<boolean> {

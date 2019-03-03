@@ -49,7 +49,7 @@
 		"keybindings": [
 			{
 				"command": "extension.runGenStat",
-				"key": "Ctrl+F5",
+				"key": "F12",
 				"when": "editorTextFocus && editorLangId == genstat"
 			}
 		],
