@@ -15,11 +15,11 @@
 			"patterns": [
 				{
 					"name": "keyword.control.gen",
-					"match": "\\b(for|endfor|if|endif)\\b"
+					"match": "^\\s*(for|endfor|if|endif)\\b"
 				},
 				{
 					"name": "keyword.control.gen",
-					"match": "\\b(else|elsif)\\b"
+					"match": "^\\s*(else|elsif)\\b"
 				},
 				{
 					"name": "keyword.operator.other.gen",
