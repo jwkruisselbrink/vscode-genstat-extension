@@ -41,19 +41,30 @@
 		"commands": [
 			{
 				"command": "genstat.runGenStat",
-				"title": "Genstat: Run GenStat"
+				"title": "Genstat: Run GenStat",
+				"icon": {
+					"light": "./media/baseline-play_arrow-24px.svg",
+					"dark": "./media/baseline-play_arrow-24px_dark.svg"
+				}
 			},
 			{
-				"command": "genstat.printReferences",
-				"title": "GenStat: create terminal"
+				"command": "genstat.openHelp",
+				"title": "GenStat: Open help"
 			}
 		],
 		"menus": {
 			"editor/context": [
 				{
-					"command": "genstat.printReferences",
+					"command": "genstat.openHelp",
 					"when": "editorHasReferenceProvider",
-					"group": "navigation@1.31"
+					"group": "navigation"
+				}
+			],
+			"editor/title": [
+				{
+					"command": "genstat.runGenStat",
+					"group": "navigation",
+					"when": "editorLangId == genstat"
 				}
 			]
 		},
@@ -70,7 +81,7 @@
 			"properties": {
 				"path.genbatch": {
 					"type": "string",
-					"default": "C:/Program Files/R/R-3.3.0/bin/Rscript.exe",
+					"default": "C:/Program Files/Gen19Ed/Bin/GenBatch.exe",
 					"description": "Path to GenBatch.exe"
 				}
 			}
