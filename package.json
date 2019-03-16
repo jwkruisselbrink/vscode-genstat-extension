@@ -14,19 +14,21 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.runGenStat",
-		"onCommand:extension.createTerminal"
+		"onLanguage:genstat"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"languages": [
 			{
 				"id": "genstat",
-				"extensions": [ ".gen" ],
+				"extensions": [
+					".gen"
+				],
 				"aliases": [
 					"gen",
 					"Gen"
-				]
+				],
+				"configuration": "./languages/language-configuration.json"
 			}
 		],
 		"grammars": [
@@ -38,17 +40,26 @@
 		],
 		"commands": [
 			{
-				"command": "extension.runGenStat",
+				"command": "genstat.runGenStat",
 				"title": "Genstat: Run GenStat"
 			},
 			{
-				"command": "extension.createTerminal",
+				"command": "genstat.printReferences",
 				"title": "GenStat: create terminal"
 			}
 		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "genstat.printReferences",
+					"when": "editorHasReferenceProvider",
+					"group": "navigation@1.31"
+				}
+			]
+		},
 		"keybindings": [
 			{
-				"command": "extension.runGenStat",
+				"command": "genstat.runGenStat",
 				"key": "F12",
 				"when": "editorTextFocus && editorLangId == genstat"
 			}
