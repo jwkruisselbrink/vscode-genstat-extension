@@ -50,6 +50,10 @@
 			{
 				"command": "genstat.openHelp",
 				"title": "GenStat: Open help"
+			},
+			{
+				"command": "genstat.openGenStatOutput",
+				"title": "GenStat: View output"
 			}
 		],
 		"menus": {
@@ -72,6 +76,11 @@
 			{
 				"command": "genstat.runGenStat",
 				"key": "F12",
+				"when": "editorTextFocus && editorLangId == genstat"
+			},
+			{
+				"command": "genstat.openHelp",
+				"key": "F11",
 				"when": "editorTextFocus && editorLangId == genstat"
 			}
 		],

@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 import * as path from "path";
 const cp = require('child_process');
+const fs = require('fs');
 
 import { ViewColumn } from 'vscode';
 import { VscodeSettings } from "./vscodeSettings";
 import { GenStatOutputChannel } from "./outputChannel";
-import { outputContentProvider } from './outputContentProvider';
+import { OutputContentProvider } from './outputContentProvider';
+import { genstatKeywords } from './genstatKeywords';
 
 const status: any = {};
 
@@ -15,7 +16,7 @@ const status: any = {};
 export function activate(context: vscode.ExtensionContext) {
 
 	const myScheme = 'genstatOutput';
-	const myOutputContentProvider = new outputContentProvider();
+	const myOutputContentProvider = new OutputContentProvider();
 
 	context.subscriptions.push(
 		vscode.workspace.registerTextDocumentContentProvider(myScheme, myOutputContentProvider)
@@ -26,7 +27,15 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(
-		vscode.commands.registerTextEditorCommand('genstat.openHelp', () => openGenStatHelp())
+		vscode.commands.registerTextEditorCommand('genstat.openHelp', async () => {
+			openGenStatHelp();
+		})
+	);
+
+	context.subscriptions.push(
+		vscode.commands.registerTextEditorCommand('genstat.openGenStatOutput', async () => {
+			openGenStatOutput();
+		})
 	);
 }
 
@@ -34,8 +43,23 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() { }
 
 async function openGenStatHelp(): Promise<void> {
+	const activeTextEditor = vscode.window.activeTextEditor;
+	let position = activeTextEditor.selection.start;
+	let wordRange = activeTextEditor.document.getWordRangeAtPosition(position);
+	let word = wordRange ? activeTextEditor.document.getText(wordRange) : '';
+	let lineText = activeTextEditor.document.lineAt(position.line).text;
+	let lineTillCurrentPosition = lineText.substr(0, wordRange.start.character);
+
+	let topic = "";
+	let wordPart = word.substr(0,4);
+	if (/^\s*$/.test(lineTillCurrentPosition)) {
+		var keywords = genstatKeywords.filter(r => r.substr(0,4) === wordPart);
+		if (keywords.length > 0) {
+			topic = keywords[0].substr(0, 8);
+		}
+	}
+
 	const pathGenHelp = `C:/Program Files/Gen19Ed/Doc/Genstat.chm`;
-	const topic = "ACONFIDE";
 	let cmd = "";
 	if (!topic) {
 		cmd = `hh.exe ${pathGenHelp}`;
@@ -64,27 +88,66 @@ async function runGenStat(): Promise<void> {
 		}
 
 		const wad = activeTextEditor.document;
-		GenStatOutputChannel.start(`Running GenStat file ${wad.fileName}`);
+		const filePath = wad.fileName;
+		GenStatOutputChannel.start(`Running GenStat file ${filePath}`);
 
+		await wad.save();
+		const basename = path.basename(filePath, path.extname(filePath));
+		const outPath = path.join(path.dirname(filePath), basename + ".lis");
+		const cmd = `"${pathGenBatch}" IN="${filePath}" "${outPath}"`;
 		try {
-			await wad.save();
 			await vscode.window.withProgress({
 				location: vscode.ProgressLocation.Window,
 				title: "Running GenStat...",
 			}, async () => {
-				const inPath = wad.fileName;
-				const basename = path.basename(inPath, path.extname(inPath));
-				const outPath = path.join(path.dirname(inPath), basename + ".lis");
-				const cmd = `"${pathGenBatch}" IN="${inPath}" "${outPath}"`;
-				cp.execSync(cmd);
-				const doc = await vscode.workspace.openTextDocument(outPath);
-				await vscode.window.showTextDocument(doc, (activeTextEditor.viewColumn as ViewColumn) + 1, true);
+				await execPromise(cmd);
+				GenStatOutputChannel.end(`Run GenStat complete!`);
 			});
-			GenStatOutputChannel.end(`Run GenStat complete!`);
 		} catch (ex) {
 			GenStatOutputChannel.error(`Run GenStat failed: ${ex.message}!`);
+		} finally {
+			if (fs.existsSync(outPath)) {
+				await showGenStatOutput(outPath);
+			}
 		}
 
 		delete status.compile;
 	}
+}
+
+function execPromise(command) {
+    return new Promise(function(resolve, reject) {
+        cp.exec(command, (error, stdout, stderr) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+            resolve(stdout.trim());
+        });
+    });
+}
+
+async function showGenStatOutput(fileName): Promise<void> {
+	const basename = path.basename(fileName);
+	let uri = vscode.Uri.parse(`genstatOutput:${basename}`);
+	let doc = await vscode.workspace.openTextDocument(uri);
+	await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside });
+}
+
+async function openGenStatOutput(): Promise<void> {
+	const activeTextEditor = vscode.window.activeTextEditor;
+	if (!activeTextEditor) {
+		vscode.window.showInformationMessage(`Error: no GenStat file in active editor window!`);
+		delete status.compile;
+		return;
+	}
+
+	const wad = activeTextEditor.document;
+	GenStatOutputChannel.start(`Running GenStat file ${wad.fileName}`);
+
+	const basename = path.basename(wad.fileName);
+
+	let uri = vscode.Uri.parse(`genstatOutput:${basename}`);
+	let doc = await vscode.workspace.openTextDocument(uri);
+	await vscode.window.showTextDocument(doc, { preview: false });
 }
