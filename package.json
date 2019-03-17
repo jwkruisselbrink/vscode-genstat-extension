@@ -58,10 +58,6 @@
 			{
 				"command": "genstat.openHelp",
 				"title": "GenStat: Open help"
-			},
-			{
-				"command": "genstat.openGenStatOutput",
-				"title": "GenStat: View output"
 			}
 		],
 		"menus": {

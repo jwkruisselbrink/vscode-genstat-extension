@@ -23,18 +23,12 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand('genstat.runGenStat', () => runGenStat())
+		vscode.commands.registerCommand('genstat.runGenStat', () => runGenStat(myOutputContentProvider))
 	);
 
 	context.subscriptions.push(
 		vscode.commands.registerTextEditorCommand('genstat.openHelp', async () => {
 			openGenStatHelp();
-		})
-	);
-
-	context.subscriptions.push(
-		vscode.commands.registerTextEditorCommand('genstat.openGenStatOutput', async () => {
-			openGenStatOutput();
 		})
 	);
 }
@@ -69,7 +63,7 @@ async function openGenStatHelp(): Promise<void> {
 	return cp.execSync(cmd);
 }
 
-async function runGenStat(): Promise<void> {
+async function runGenStat(provider: OutputContentProvider): Promise<void> {
 	if (!status.compile) {
 		status.compile = "run";
 
@@ -107,7 +101,7 @@ async function runGenStat(): Promise<void> {
 			GenStatOutputChannel.error(`Run GenStat failed: ${ex.message}!`);
 		} finally {
 			if (fs.existsSync(outPath)) {
-				await showGenStatOutput(outPath);
+				await showGenStatOutput(outPath, provider);
 			}
 		}
 
@@ -127,27 +121,10 @@ function execPromise(command) {
     });
 }
 
-async function showGenStatOutput(fileName): Promise<void> {
+async function showGenStatOutput(fileName: string, provider: OutputContentProvider): Promise<void> {
 	const basename = path.basename(fileName);
 	let uri = vscode.Uri.parse(`genstatOutput:${basename}`);
 	let doc = await vscode.workspace.openTextDocument(uri);
 	await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside, preserveFocus: true });
-}
-
-async function openGenStatOutput(): Promise<void> {
-	const activeTextEditor = vscode.window.activeTextEditor;
-	if (!activeTextEditor) {
-		vscode.window.showInformationMessage(`Error: no GenStat file in active editor window!`);
-		delete status.compile;
-		return;
-	}
-
-	const wad = activeTextEditor.document;
-	GenStatOutputChannel.start(`Running GenStat file ${wad.fileName}`);
-
-	const basename = path.basename(wad.fileName);
-
-	let uri = vscode.Uri.parse(`genstatOutput:${basename}`);
-	let doc = await vscode.workspace.openTextDocument(uri);
-	await vscode.window.showTextDocument(doc, { preview: false });
+	provider.onDidChangeEmitter.fire(uri);
 }
