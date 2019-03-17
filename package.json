@@ -115,12 +115,7 @@
 		"vscode": "^1.1.28",
 		"tslint": "^5.12.1",
 		"@types/node": "^10.12.21",
-		"@types/mocha": "^2.2.42",
-		"@types/fs-extra": "^5.0.1",
-		"@types/trash": "^4.3.0"
+		"@types/mocha": "^2.2.42"
 	},
-	"dependencies": {
-		"fs-extra": "^7.0.0",
-		"trash": "^4.3.0"
-	}
+	"dependencies": {}
 }

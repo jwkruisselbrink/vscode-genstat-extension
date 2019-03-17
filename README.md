@@ -8,6 +8,10 @@ Visual Studio Code extension for running GenStat scripts. Includes syntax highli
 * Open GenStat help (F11)
 * Syntax highlighting
 
+### Supported platforms
+
+* Windows x64
+
 ## Release Notes
 
 Users appreciate release notes as you update your extension.
