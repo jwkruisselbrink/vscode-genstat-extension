@@ -131,7 +131,7 @@ async function showGenStatOutput(fileName): Promise<void> {
 	const basename = path.basename(fileName);
 	let uri = vscode.Uri.parse(`genstatOutput:${basename}`);
 	let doc = await vscode.workspace.openTextDocument(uri);
-	await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside });
+	await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside, preserveFocus: true });
 }
 
 async function openGenStatOutput(): Promise<void> {
