@@ -1,117 +1,117 @@
 {
-	"name": "vsgenstat",
-	"displayName": "VSGenStat",
-	"description": "GenStat extension for Visual Studio Code",
-	"version": "0.0.1",
-	"publisher": "Johannes Kruisselbrink",
-	"engines": {
-		"vscode": "^1.31.0"
-	},
-	"keywords": [
-		"GenStat"
-	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/jwkruisselbrink/vscode-genstat-extension"
-	},
-	"bugs": {
-		"url": "https://github.com/jwkruisselbrink/vscode-genstat-extension/issues"
-	},
-	"license": "MIT",
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-		"onLanguage:genstat"
-	],
-	"main": "./out/extension.js",
-	"contributes": {
-		"languages": [
-			{
-				"id": "genstat",
-				"extensions": [
-					".gen"
-				],
-				"aliases": [
-					"gen",
-					"Gen"
-				],
-				"configuration": "./languages/language-configuration.json"
-			}
-		],
-		"grammars": [
-			{
-				"language": "genstat",
-				"scopeName": "source.gen",
-				"path": "./syntaxes/genstat.syntax.json"
-			}
-		],
-		"commands": [
-			{
-				"command": "genstat.runGenStat",
-				"title": "Genstat: Run GenStat",
-				"icon": {
-					"light": "./media/baseline-play_arrow-24px.svg",
-					"dark": "./media/baseline-play_arrow-24px_dark.svg"
-				}
-			},
-			{
-				"command": "genstat.openHelp",
-				"title": "GenStat: Open help"
-			}
-		],
-		"menus": {
-			"editor/context": [
-				{
-					"command": "genstat.openHelp",
-					"when": "editorHasReferenceProvider",
-					"group": "navigation"
-				}
-			],
-			"editor/title": [
-				{
-					"command": "genstat.runGenStat",
-					"group": "navigation",
-					"when": "editorLangId == genstat"
-				}
-			]
-		},
-		"keybindings": [
-			{
-				"command": "genstat.runGenStat",
-				"key": "F12",
-				"when": "editorTextFocus && editorLangId == genstat"
-			},
-			{
-				"command": "genstat.openHelp",
-				"key": "F11",
-				"when": "editorTextFocus && editorLangId == genstat"
-			}
-		],
-		"configuration": {
-			"type": "object",
-			"title": "GenStat",
-			"properties": {
-				"path.genbatch": {
-					"type": "string",
-					"default": "C:/Program Files/Gen19Ed/Bin/GenBatch.exe",
-					"description": "Path to GenBatch.exe"
-				}
-			}
-		}
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install"
-	},
-	"devDependencies": {
-		"typescript": "^3.3.1",
-		"vscode": "^1.1.28",
-		"tslint": "^5.12.1",
-		"@types/node": "^10.12.21",
-		"@types/mocha": "^2.2.42"
-	},
-	"dependencies": {}
+    "name": "vsgenstat",
+    "displayName": "VSGenStat",
+    "description": "GenStat extension for Visual Studio Code",
+    "version": "0.0.1",
+    "publisher": "jwkruisselbrink",
+    "engines": {
+        "vscode": "^1.31.0"
+    },
+    "keywords": [
+        "GenStat"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jwkruisselbrink/vscode-genstat-extension"
+    },
+    "bugs": {
+        "url": "https://github.com/jwkruisselbrink/vscode-genstat-extension/issues"
+    },
+    "license": "MIT",
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onLanguage:genstat"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "languages": [
+            {
+                "id": "genstat",
+                "extensions": [
+                    ".gen"
+                ],
+                "aliases": [
+                    "gen",
+                    "Gen"
+                ],
+                "configuration": "./languages/language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "genstat",
+                "scopeName": "source.gen",
+                "path": "./syntaxes/genstat.syntax.json"
+            }
+        ],
+        "commands": [
+            {
+                "command": "genstat.runGenStat",
+                "title": "Genstat: Run GenStat",
+                "icon": {
+                    "light": "./media/baseline-play_arrow-24px.svg",
+                    "dark": "./media/baseline-play_arrow-24px_dark.svg"
+                }
+            },
+            {
+                "command": "genstat.openHelp",
+                "title": "GenStat: Open help"
+            }
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "command": "genstat.openHelp",
+                    "when": "editorHasReferenceProvider",
+                    "group": "navigation"
+                }
+            ],
+            "editor/title": [
+                {
+                    "command": "genstat.runGenStat",
+                    "group": "navigation",
+                    "when": "editorLangId == genstat"
+                }
+            ]
+        },
+        "keybindings": [
+            {
+                "command": "genstat.runGenStat",
+                "key": "F12",
+                "when": "editorTextFocus && editorLangId == genstat"
+            },
+            {
+                "command": "genstat.openHelp",
+                "key": "F11",
+                "when": "editorTextFocus && editorLangId == genstat"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "GenStat",
+            "properties": {
+                "path.genbatch": {
+                    "type": "string",
+                    "default": "C:/Program Files/Gen19Ed/Bin/GenBatch.exe",
+                    "description": "Path to GenBatch.exe"
+                }
+            }
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "typescript": "^3.3.1",
+        "vscode": "^1.1.28",
+        "tslint": "^5.12.1",
+        "@types/node": "^10.12.21",
+        "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {}
 }
