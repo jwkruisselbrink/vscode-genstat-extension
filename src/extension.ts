@@ -8,22 +8,25 @@ import { VscodeSettings } from "./vscodeSettings";
 import { GenStatOutputChannel } from "./outputChannel";
 import { OutputContentProvider } from './outputContentProvider';
 import { genstatKeywords } from './genstatKeywords';
+import { GenStatKeywordProvider } from './genstatKeywordProvider';
 
 const status: any = {};
+let genstatKeywordProvider: GenStatKeywordProvider;
+let genstatOutputContentProvider: OutputContentProvider;
 
 // method called when the extension is activated
 // the extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-    const myScheme = 'genstatOutput';
-    const myOutputContentProvider = new OutputContentProvider();
+    genstatOutputContentProvider = new OutputContentProvider();
+    genstatKeywordProvider = new GenStatKeywordProvider();
 
     context.subscriptions.push(
-        vscode.workspace.registerTextDocumentContentProvider(myScheme, myOutputContentProvider)
+        vscode.workspace.registerTextDocumentContentProvider('genstatOutput', genstatOutputContentProvider)
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('genstat.runGenStat', () => runGenStat(myOutputContentProvider))
+        vscode.commands.registerCommand('genstat.runGenStat', () => runGenStat())
     );
 
     context.subscriptions.push(
@@ -44,26 +47,22 @@ async function openGenStatHelp(): Promise<void> {
     let lineText = activeTextEditor.document.lineAt(position.line).text;
     let lineTillCurrentPosition = lineText.substr(0, wordRange.start.character);
 
-    let topic = "";
-    let wordPart = word.substr(0,4);
+    let keyword = "";
     if (/^\s*$/.test(lineTillCurrentPosition)) {
-        var keywords = genstatKeywords.filter(r => r.substr(0,4) === wordPart);
-        if (keywords.length > 0) {
-            topic = keywords[0].substr(0, 8);
-        }
+        keyword = genstatKeywordProvider.tryFindKeyword(word.substr(0,4));
     }
 
     const pathGenHelp = `C:/Program Files/Gen19Ed/Doc/Genstat.chm`;
     let cmd = "";
-    if (!topic) {
+    if (!keyword) {
         cmd = `hh.exe ${pathGenHelp}`;
     } else {
-        cmd = `hh.exe ${pathGenHelp}::/html/server/${topic}.htm`;
+        cmd = `hh.exe ${pathGenHelp}::/html/server/${keyword}.htm`;
     }
     return cp.execSync(cmd);
 }
 
-async function runGenStat(provider: OutputContentProvider): Promise<void> {
+async function runGenStat(): Promise<void> {
     if (!status.compile) {
         status.compile = "run";
 
@@ -101,7 +100,7 @@ async function runGenStat(provider: OutputContentProvider): Promise<void> {
             GenStatOutputChannel.error(`Run GenStat failed: ${ex.message}!`);
         } finally {
             if (fs.existsSync(outPath)) {
-                await showGenStatOutput(outPath, provider);
+                await showGenStatOutput(outPath);
             }
         }
 
@@ -121,10 +120,10 @@ function execPromise(command) {
     });
 }
 
-async function showGenStatOutput(fileName: string, provider: OutputContentProvider): Promise<void> {
+async function showGenStatOutput(fileName: string): Promise<void> {
     const basename = path.basename(fileName);
     let uri = vscode.Uri.parse(`genstatOutput:${basename}`);
     let doc = await vscode.workspace.openTextDocument(uri);
     await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside, preserveFocus: true });
-    provider.onDidChangeEmitter.fire(uri);
+    genstatOutputContentProvider.onDidChangeEmitter.fire(uri);
 }
