@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from "path";
+
 const cp = require('child_process');
 const fs = require('fs');
 
@@ -7,11 +8,10 @@ import { ViewColumn } from 'vscode';
 import { VscodeSettings } from "./vscodeSettings";
 import { GenStatOutputChannel } from "./outputChannel";
 import { OutputContentProvider } from './outputContentProvider';
-import { genstatKeywords } from './genstatKeywords';
-import { GenStatKeywordProvider } from './genstatKeywordProvider';
+import { GenStatHelpProvider as GenStatHelpProvider } from './genstatHelpProvider';
 
 const status: any = {};
-let genstatKeywordProvider: GenStatKeywordProvider;
+let genStatHelpProvider: GenStatHelpProvider;
 let genstatOutputContentProvider: OutputContentProvider;
 
 // method called when the extension is activated
@@ -19,48 +19,27 @@ let genstatOutputContentProvider: OutputContentProvider;
 export function activate(context: vscode.ExtensionContext) {
 
     genstatOutputContentProvider = new OutputContentProvider();
-    genstatKeywordProvider = new GenStatKeywordProvider();
+    genStatHelpProvider = new GenStatHelpProvider();
 
     context.subscriptions.push(
         vscode.workspace.registerTextDocumentContentProvider('genstatOutput', genstatOutputContentProvider)
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('genstat.runGenStat', () => runGenStat())
+        vscode.commands.registerCommand('genstat.runGenStat', () => {
+            runGenStat()
+        })
     );
 
     context.subscriptions.push(
-        vscode.commands.registerTextEditorCommand('genstat.openHelp', async () => {
-            openGenStatHelp();
+        vscode.commands.registerTextEditorCommand('genstat.openHelp', () => {
+            genStatHelpProvider.openGenStatHelp();
         })
     );
 }
 
 // method called when the extension is deactivated
 export function deactivate() { }
-
-async function openGenStatHelp(): Promise<void> {
-    const activeTextEditor = vscode.window.activeTextEditor;
-    let position = activeTextEditor.selection.start;
-    let wordRange = activeTextEditor.document.getWordRangeAtPosition(position);
-    let word = wordRange ? activeTextEditor.document.getText(wordRange) : '';
-    let lineText = activeTextEditor.document.lineAt(position.line).text;
-    let lineTillCurrentPosition = lineText.substr(0, wordRange.start.character);
-
-    let keyword = "";
-    if (/^\s*$/.test(lineTillCurrentPosition)) {
-        keyword = genstatKeywordProvider.tryFindKeyword(word.substr(0,4));
-    }
-
-    const pathGenHelp = `C:/Program Files/Gen19Ed/Doc/Genstat.chm`;
-    let cmd = "";
-    if (!keyword) {
-        cmd = `hh.exe ${pathGenHelp}`;
-    } else {
-        cmd = `hh.exe ${pathGenHelp}::/html/server/${keyword}.htm`;
-    }
-    return cp.execSync(cmd);
-}
 
 async function runGenStat(): Promise<void> {
     if (!status.compile) {
