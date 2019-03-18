@@ -1,12 +1,18 @@
+import * as vscode from 'vscode';
 import { biometrisKeywords } from "./biometrisKeywords";
 import { genstatKeywords } from "./genstatKeywords";
-import * as vscode from 'vscode';
+import { VscodeSettings } from "./vscodeSettings";
 
 const cp = require('child_process');
 export class GenStatHelpProvider {
 
     private _keyWordMap: Map<string, string>;
     private _helpChildProcess: any;
+    private _pathGenStatChm: string;
+
+    constructor() {
+        this._pathGenStatChm = VscodeSettings.getInstance().pathGenBatch.replace("Bin/GenBatch.exe", "Doc/Genstat.chm");
+    }
 
     public get KeywordMap(): Map<string, string> {
         if (!this._keyWordMap) {
@@ -40,13 +46,12 @@ export class GenStatHelpProvider {
             keyword = keyword.substr(0,8);
         }
 
-        const pathGenHelp = `C:/Program Files/Gen19Ed/Doc/Genstat.chm`;
         let cmd = "hh.exe";
         let args = [];
         if (!keyword) {
-            args = [`${pathGenHelp}`];
+            args = [`${this._pathGenStatChm}`];
         } else {
-            args = [`${pathGenHelp}::/html/server/${keyword}.htm`];
+            args = [`${this._pathGenStatChm}::/html/server/${keyword}.htm`];
         }
 
         if (this._helpChildProcess) {
