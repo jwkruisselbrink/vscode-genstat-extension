@@ -103,6 +103,14 @@ async function showGenStatOutput(fileName: string): Promise<void> {
     const basename = path.basename(fileName);
     let uri = vscode.Uri.parse(`genstatOutput:${basename}`);
     let doc = await vscode.workspace.openTextDocument(uri);
-    await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside, preserveFocus: true });
+    const unique = (value, index, self) => {
+        return self.indexOf(value) === index;
+    }
+    let viewColumns = vscode.window.visibleTextEditors.map(r => r.viewColumn).filter(unique);
+    if (viewColumns.length > 1) {
+        await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside, preserveFocus: true });
+    } else {
+        await vscode.window.showTextDocument(doc, { preview: false, viewColumn: viewColumns[0], preserveFocus: true });
+    }
     genstatOutputContentProvider.onDidChangeEmitter.fire(uri);
 }
