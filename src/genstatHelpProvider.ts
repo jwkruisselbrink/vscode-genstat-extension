@@ -38,7 +38,7 @@ export class GenStatHelpProvider {
         let lineText = activeTextEditor.document.lineAt(position.line).text.trim();
 
         let keyword = "";
-        let matchFirstWord = lineText.match(/^(\S+)\s(.*)/);
+        let matchFirstWord = lineText.match(/^(\S+)(\s*)(.*)/);
         if (matchFirstWord) {
             keyword = matchFirstWord.slice(1)[0];
         }
