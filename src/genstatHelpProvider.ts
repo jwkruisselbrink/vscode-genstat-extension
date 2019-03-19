@@ -25,23 +25,34 @@ export class GenStatHelpProvider {
     }
 
     public tryFindKeyword(str: string) {
-        let upper = str.toUpperCase();
+        let upper = str.substr(0,4).toUpperCase();
         if (this.KeywordMap.has(upper)) {
             return this.KeywordMap.get(upper);
         }
         return null;
     }
 
-    public openGenStatHelp(): void {
+    public openGenStatHelpAtCurrentLocation(): void {
         const activeTextEditor = vscode.window.activeTextEditor;
         let position = activeTextEditor.selection.start;
         let lineText = activeTextEditor.document.lineAt(position.line).text.trim();
 
-        let keyword = "";
         let matchFirstWord = lineText.match(/^(\S+)(\s*)(.*)/);
+        let matchedWord = "";
         if (matchFirstWord) {
-            keyword = matchFirstWord.slice(1)[0];
+            matchedWord = matchFirstWord.slice(1)[0];
+        } else {
+            vscode.window.showErrorMessage(`No keyword found!`);
+            return;
         }
+        let keyword = matchedWord;
+
+        keyword = this.tryFindKeyword(keyword);
+        if (!keyword || keyword.length === 0) {
+            vscode.window.showErrorMessage(`Unknown keyword ${matchedWord}!`);
+            return;
+        }
+
         if (keyword.length > 8) {
             keyword = keyword.substr(0,8);
         }

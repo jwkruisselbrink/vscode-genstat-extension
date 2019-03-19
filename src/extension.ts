@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerTextEditorCommand('genstat.openHelp', () => {
-            genStatHelpProvider.openGenStatHelp();
+            genStatHelpProvider.openGenStatHelpAtCurrentLocation();
         })
     );
 }
