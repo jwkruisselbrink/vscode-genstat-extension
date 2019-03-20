@@ -96,19 +96,12 @@
                             "name": "punctuation.definition.comment.begin.gen"
                         }
                     },
-                    "end": "\"|$",
+                    "end": "\"",
                     "endCaptures": {
                         "0": {
                             "name": "punctuation.definition.comment.end.gen"
                         }
-                    },
-                    "patterns": [
-                        {
-                            "begin": "(?:\\G|^)(?=(?:[^\"])+$)",
-                            "end": "$",
-                            "name": "invalid.illegal.unclosed.string.gen"
-                        }
-                    ]
+                    }
                 }
             ]
         },
