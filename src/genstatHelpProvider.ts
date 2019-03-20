@@ -35,7 +35,12 @@ export class GenStatHelpProvider {
     public openGenStatHelpAtCurrentLocation(): void {
         const activeTextEditor = vscode.window.activeTextEditor;
         let position = activeTextEditor.selection.start;
-        let lineText = activeTextEditor.document.lineAt(position.line).text.trim();
+
+        let line = position.line;
+        while (line > 0 && activeTextEditor.document.lineAt(line - 1).text.indexOf('\\') >= 0) {
+            line = line -1;
+        }
+        let lineText = activeTextEditor.document.lineAt(line).text.trim();
 
         let matchFirstWord = lineText.match(/^(\S+)(\s*)(.*)/);
         let matchedWord = "";
