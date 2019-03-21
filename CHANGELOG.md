@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.0.3 (21-03-2019)
+
+- Fixed: open help for lines containing a keyword only (e.g., endfor).
+- Fixed: actually test for known keywords.
+- Fixed: syntex highlighting of double-quoted comments covering multiple lines.
+- Fixed: open help function to trace back first line and keyword of multiple line statements.
+
 ## 0.0.2 (19-03-2019)
 
 - Changed: only open output in next tab when multiple editor tabs are available (otherwise open in same tab).
