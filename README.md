@@ -1,4 +1,6 @@
-# VsGenStat README
+# GenStat extension for Visual Studio Code
+
+Requires [GenStat](https://www.vsni.co.uk/software/genstat/).
 
 Visual Studio Code extension for running GenStat scripts. Includes syntax highlighting and help function.
 
@@ -12,10 +14,3 @@ Visual Studio Code extension for running GenStat scripts. Includes syntax highli
 
 * Windows x64
 
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 0.0.1
-
-Initial release of VsGenStat. First prototype version.
