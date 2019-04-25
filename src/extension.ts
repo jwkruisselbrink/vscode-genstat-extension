@@ -108,9 +108,9 @@ async function showGenStatOutput(fileName: string): Promise<void> {
     }
     let viewColumns = vscode.window.visibleTextEditors.map(r => r.viewColumn).filter(unique);
     if (viewColumns.length > 1) {
-        await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside, preserveFocus: true });
+        await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside, preserveFocus: false });
     } else {
-        await vscode.window.showTextDocument(doc, { preview: false, viewColumn: viewColumns[0], preserveFocus: true });
+        await vscode.window.showTextDocument(doc, { preview: false, viewColumn: viewColumns[0], preserveFocus: false });
     }
     genstatOutputContentProvider.onDidChangeEmitter.fire(uri);
 }
