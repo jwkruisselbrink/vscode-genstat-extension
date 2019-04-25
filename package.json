@@ -93,10 +93,20 @@
             "type": "object",
             "title": "GenStat",
             "properties": {
-                "path.genbatch": {
+                "vsgenstat.path.genbatch": {
                     "type": "string",
                     "default": "C:/Program Files/Gen19Ed/Bin/GenBatch.exe",
-                    "description": "Path to GenBatch.exe"
+                    "description": "Path to GenBatch.exe (including filename)"
+                },
+                "vsgenstat.path.genstat.help": {
+                    "type": "string",
+                    "default": "./Doc/Genstat.chm",
+                    "description": "Path to help file (including filename)"
+                },
+                "vsgenstat.path.biometris.help": {
+                    "type": "string",
+                    "default": "./AddIns/Biometris-19ed.chm",
+                    "description": "Path to GenStat Biometris AddIn help file (including filename)"
                 }
             }
         }
