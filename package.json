@@ -2,6 +2,7 @@
     "name": "vsgenstat",
     "displayName": "VSGenStat",
     "description": "GenStat extension for Visual Studio Code",
+    "icon": "images/logo.png",
     "version": "0.0.3",
     "publisher": "vsgenstat",
     "engines": {
