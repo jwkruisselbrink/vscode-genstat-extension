@@ -32,6 +32,12 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
+        vscode.commands.registerTextEditorCommand('genstat.switchToSource', () => {
+            switchToSource();
+        })
+    );
+
+    context.subscriptions.push(
         vscode.commands.registerTextEditorCommand('genstat.openHelp', () => {
             genStatHelpProvider.openGenStatHelpAtCurrentLocation();
         })
@@ -87,6 +93,42 @@ async function runGenStat(): Promise<void> {
     }
 }
 
+async function switchToSource(): Promise<void> {
+    const activeTextEditor = vscode.window.activeTextEditor;
+    if (!activeTextEditor) {
+        return;
+    }
+    const wad = activeTextEditor.document;
+    const basename = path.basename(wad.fileName, path.extname(wad.fileName));
+    const sourcePath = path.join(path.dirname(wad.fileName), basename + ".gen");
+
+    let sourceDoc = vscode.workspace.textDocuments.find(doc => path.parse(doc.fileName).base === sourcePath);
+    if (sourceDoc !== null) {
+        let sourceTextEditor = vscode.window.visibleTextEditors.find(r => r.document == sourceDoc);
+        await vscode.window.showTextDocument(sourceDoc,  { preview: false, viewColumn: sourceTextEditor.viewColumn, preserveFocus: false });
+    } else if (fs.existsSync(sourcePath)) {
+        vscode.workspace.openTextDocument(sourcePath).then(doc => {
+            vscode.window.showTextDocument(doc);
+         });
+    } else {
+        vscode.window.showErrorMessage(`Source file not found for this GenStat output file!`);
+    }
+}
+
+async function showGenStatOutput(fileName: string): Promise<void> {
+    const basename = path.basename(fileName);
+    let uri = vscode.Uri.parse(`genstatOutput:${basename}`);
+    let doc = await vscode.workspace.openTextDocument(uri);
+    const unique = (value, index, self) => { return self.indexOf(value) === index; }
+    let viewColumns = vscode.window.visibleTextEditors.map(r => r.viewColumn).filter(unique);
+    if (viewColumns.length > 1) {
+        await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside, preserveFocus: false });
+    } else {
+        await vscode.window.showTextDocument(doc, { preview: false, viewColumn: viewColumns[0], preserveFocus: false });
+    }
+    genstatOutputContentProvider.onDidChangeEmitter.fire(uri);
+}
+
 function execPromise(command) {
     return new Promise(function(resolve, reject) {
         cp.exec(command, (error, stdout, stderr) => {
@@ -97,20 +139,4 @@ function execPromise(command) {
             resolve(stdout.trim());
         });
     });
-}
-
-async function showGenStatOutput(fileName: string): Promise<void> {
-    const basename = path.basename(fileName);
-    let uri = vscode.Uri.parse(`genstatOutput:${basename}`);
-    let doc = await vscode.workspace.openTextDocument(uri);
-    const unique = (value, index, self) => {
-        return self.indexOf(value) === index;
-    }
-    let viewColumns = vscode.window.visibleTextEditors.map(r => r.viewColumn).filter(unique);
-    if (viewColumns.length > 1) {
-        await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside, preserveFocus: false });
-    } else {
-        await vscode.window.showTextDocument(doc, { preview: false, viewColumn: viewColumns[0], preserveFocus: false });
-    }
-    genstatOutputContentProvider.onDidChangeEmitter.fire(uri);
 }

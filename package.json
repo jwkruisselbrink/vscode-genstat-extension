@@ -38,6 +38,17 @@
                     "Gen"
                 ],
                 "configuration": "./languages/language-configuration.json"
+            },
+            {
+                "id": "genstat.output",
+                "extensions": [
+                    ".lis"
+                ],
+                "aliases": [
+                    "lis",
+                    "Lis"
+                ],
+                "configuration": "./languages/language-configuration.json"
             }
         ],
         "grammars": [
@@ -45,6 +56,11 @@
                 "language": "genstat",
                 "scopeName": "source.gen",
                 "path": "./syntaxes/genstat.syntax.json"
+            },
+            {
+                "language": "genstat.output",
+                "scopeName": "source.gen.out",
+                "path": "./syntaxes/genstat.output.syntax.json"
             }
         ],
         "commands": [
@@ -59,6 +75,14 @@
             {
                 "command": "genstat.openHelp",
                 "title": "GenStat: Open help"
+            },
+            {
+                "command": "genstat.switchToSource",
+                "title": "GenStat: switch to source file",
+                "icon": {
+                    "light": "./media/baseline-swap_horiz-24px.svg",
+                    "dark": "./media/baseline-swap_horiz-24px_dark.svg"
+                }
             }
         ],
         "menus": {
@@ -74,6 +98,11 @@
                     "command": "genstat.runGenStat",
                     "group": "navigation",
                     "when": "editorLangId == genstat"
+                },
+                {
+                    "command": "genstat.switchToSource",
+                    "when": "editorLangId == genstat.output",
+                    "group": "navigation"
                 }
             ]
         },
@@ -87,6 +116,11 @@
                 "command": "genstat.openHelp",
                 "key": "F11",
                 "when": "editorTextFocus && editorLangId == genstat"
+            },
+            {
+                "command": "genstat.switchToSource",
+                "key": "Alt+F12",
+                "when": "editorTextFocus && editorLangId == genstat.output"
             }
         ],
         "configuration": {

@@ -1,0 +1,9 @@
+{
+    "scopeName": "source.gen.out",
+    "patterns": [{ "include": "#expression" }],
+    "repository": {
+        "expression": {
+            "patterns": [ ]
+        }
+    }
+}
