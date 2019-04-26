@@ -31,7 +31,9 @@
             {
                 "id": "genstat",
                 "extensions": [
-                    ".gen"
+                    ".gen",
+                    ".ex",
+                    ".pro"
                 ],
                 "aliases": [
                     "gen",
