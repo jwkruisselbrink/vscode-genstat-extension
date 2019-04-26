@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.0.4 (26-04-2019)
+
+- Added: genstat output file language definition and association with .lis files.
+- Added: switch command to quickly switch from genstat output file to source file.
+- Added: open help for Biometris AddIn commands.
+- Added: association of .ex and .pro files with genstat source files.
+- Added: extension logo.
+- Changed: change focus of editor to genstat output when run complete.
+
 ## 0.0.3 (21-03-2019)
 
 - Fixed: open help for lines containing a keyword only (e.g., endfor).
