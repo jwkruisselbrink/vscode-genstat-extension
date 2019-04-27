@@ -1,18 +1,18 @@
 import * as vscode from 'vscode';
 import * as path from "path";
 
-const cp = require('child_process');
 const fs = require('fs');
 
 import { ViewColumn } from 'vscode';
-import { VscodeSettings } from "./vscodeSettings";
-import { GenStatOutputChannel } from "./outputChannel";
 import { OutputContentProvider } from './outputContentProvider';
 import { GenStatHelpProvider as GenStatHelpProvider } from './genstatHelpProvider';
+import { GenStatRunner } from './genStatRunner';
+import { VscodeSettings } from './vscodeSettings';
+import { GenStatOutputChannel } from './outputChannel';
 
-const status: any = {};
 let genStatHelpProvider: GenStatHelpProvider;
 let genstatOutputContentProvider: OutputContentProvider;
+let genStatRunner: GenStatRunner;
 
 // method called when the extension is activated
 // the extension is activated the very first time the command is executed
@@ -20,6 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     genstatOutputContentProvider = new OutputContentProvider();
     genStatHelpProvider = new GenStatHelpProvider();
+    genStatRunner = new GenStatRunner();
 
     context.subscriptions.push(
         vscode.workspace.registerTextDocumentContentProvider('genstatOutput', genstatOutputContentProvider)
@@ -48,48 +49,43 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() { }
 
 async function runGenStat(): Promise<void> {
-    if (!status.compile) {
-        status.compile = "run";
 
-        const pathGenBatch = VscodeSettings.getInstance().pathGenBatch;
-        if (!pathGenBatch) {
-            vscode.window.showInformationMessage(`Error: GenBatch path not specified!`);
-            delete status.compile;
-            return;
+    const activeTextEditor = vscode.window.activeTextEditor;
+    if (!activeTextEditor) {
+        vscode.window.showInformationMessage(`Error: no GenStat file in active editor window!`);
+        delete this.status.compile;
+        return;
+    }
+
+    const wad = activeTextEditor.document;
+    const filePath = wad.fileName;
+    await wad.save();
+
+    const basename = path.basename(filePath, path.extname(filePath));
+    const outPath = path.join(path.dirname(filePath), basename + ".lis");
+
+    GenStatOutputChannel.start(`Running GenStat file ${filePath}`);
+
+    const pathGenBatch = VscodeSettings.getInstance().pathGenBatch;
+    if (!pathGenBatch) {
+        vscode.window.showInformationMessage(`Error: GenBatch path not specified!`);
+        delete this.status.compile;
+        return;
+    }
+
+    let timerStart = Date.now();
+    try {
+        await genStatRunner.runGenStat(filePath, outPath);
+        let timerStop = Date.now();
+        GenStatOutputChannel.end(`Run GenStat complete!`);
+        vscode.window.showInformationMessage(`Run GenStat completed! Duration: ${msToHMS(timerStop - timerStart)}.`);
+    } catch (ex) {
+        GenStatOutputChannel.error(`Run GenStat failed: ${ex.message}!`);
+        vscode.window.showErrorMessage(`${ex.message}`);
+    } finally {
+        if (fs.existsSync(outPath)) {
+            await showGenStatOutput(outPath);
         }
-
-        const activeTextEditor = vscode.window.activeTextEditor;
-        if (!activeTextEditor) {
-            vscode.window.showInformationMessage(`Error: no GenStat file in active editor window!`);
-            delete status.compile;
-            return;
-        }
-
-        const wad = activeTextEditor.document;
-        const filePath = wad.fileName;
-        GenStatOutputChannel.start(`Running GenStat file ${filePath}`);
-
-        await wad.save();
-        const basename = path.basename(filePath, path.extname(filePath));
-        const outPath = path.join(path.dirname(filePath), basename + ".lis");
-        const cmd = `"${pathGenBatch}" IN="${filePath}" "${outPath}"`;
-        try {
-            await vscode.window.withProgress({
-                location: vscode.ProgressLocation.Window,
-                title: "Running GenStat...",
-            }, async () => {
-                await execPromise(cmd);
-                GenStatOutputChannel.end(`Run GenStat complete!`);
-            });
-        } catch (ex) {
-            GenStatOutputChannel.error(`Run GenStat failed: ${ex.message}!`);
-        } finally {
-            if (fs.existsSync(outPath)) {
-                await showGenStatOutput(outPath);
-            }
-        }
-
-        delete status.compile;
     }
 }
 
@@ -104,8 +100,8 @@ async function switchToSource(): Promise<void> {
 
     let sourceDoc = vscode.workspace.textDocuments.find(doc => path.parse(doc.fileName).base === sourcePath);
     if (sourceDoc !== null) {
-        let sourceTextEditor = vscode.window.visibleTextEditors.find(r => r.document == sourceDoc);
-        await vscode.window.showTextDocument(sourceDoc,  { preview: false, viewColumn: sourceTextEditor.viewColumn, preserveFocus: false });
+        let sourceTextEditor = vscode.window.visibleTextEditors.find(r => r.document === sourceDoc);
+        await vscode.window.showTextDocument(sourceDoc, { preview: false, viewColumn: sourceTextEditor.viewColumn, preserveFocus: false });
     } else if (fs.existsSync(sourcePath)) {
         vscode.workspace.openTextDocument(sourcePath).then(doc => {
             vscode.window.showTextDocument(doc);
@@ -129,14 +125,11 @@ async function showGenStatOutput(fileName: string): Promise<void> {
     genstatOutputContentProvider.onDidChangeEmitter.fire(uri);
 }
 
-function execPromise(command) {
-    return new Promise(function(resolve, reject) {
-        cp.exec(command, (error, stdout, stderr) => {
-            if (error) {
-                reject(error);
-                return;
-            }
-            resolve(stdout.trim());
-        });
-    });
+function msToHMS(ms : number): string {
+    let seconds = ms / 1000;
+    let hours = Math.trunc(seconds / 3600);
+    seconds = seconds % 3600;
+    let minutes = Math.trunc(seconds / 60);
+    seconds = seconds % 60;
+    return hours + ":" + minutes + ":" + seconds;
 }
