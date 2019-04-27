@@ -5,6 +5,7 @@
         "expression": {
             "patterns": [
                 { "include": "#keywords" },
+                { "include": "#functions" },
                 { "include": "#strings" },
                 { "include": "#constants" },
                 { "include": "#comments" },
@@ -24,9 +25,13 @@
                 {
                     "name": "keyword.operator.other.gen",
                     "match": "(;|=)"
-                },
+                }
+            ]
+        },
+        "functions":{
+            "patterns": [
                 {
-                    "name": "keyword.other.gen",
+                    "name": "entity.name.function.gen",
                     "match": "^\\s*\\w*\\s"
                 }
             ]
