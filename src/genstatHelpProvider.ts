@@ -94,7 +94,7 @@ export class GenStatHelpProvider {
         } else if (foundGenStatKeyword) {
             args = [`${this._pathGenStatChm}::/html/server/${keyword}.htm`];
         } else {
-            args = [`${this._pathBiometrisChm}::/html/server/${keyword}.htm`];
+            args = [`${this._pathBiometrisChm}::${keyword}.htm`];
         }
 
         if (this._helpChildProcess) {
