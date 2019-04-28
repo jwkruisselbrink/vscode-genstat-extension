@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { biometrisKeywords } from "./biometrisKeywords";
-import { genstatKeywords } from "./genstatKeywords";
+import { genstatKeywords } from "./genStatKeywords";
 import { VscodeSettings } from "./vscodeSettings";
 
 const cp = require('child_process');

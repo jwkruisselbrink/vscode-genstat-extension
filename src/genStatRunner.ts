@@ -1,12 +1,12 @@
 import * as cp from 'child_process';
 import * as fs from 'fs';
-import * as vscode from 'vscode';
 import * as path from "path";
 
 import { VscodeSettings } from "./vscodeSettings";
 
 export class GenStatRunner {
 
+    private _genBatchHook: any;
     private _isRunning: boolean = false;
 
     constructor() {
@@ -16,24 +16,54 @@ export class GenStatRunner {
         return this._isRunning;
     }
 
-    public async runGenStat(fileIn, fileOut): Promise<void> {
+    public runGenStat(fileIn, fileOut): Promise<void> {
+        if (this._isRunning) {
+            throw new Error(`GenStat still running, cannot start another task!`);
+        }
+        this._isRunning = true;
         let pathGenBatch = this.getPathGenBatch();
-        if (!this._isRunning) {
-            try {
-                this._isRunning = true;
-                let workingDirectory = path.dirname(fileIn);
-                const cmd = `"${pathGenBatch}" IN="${fileIn}" ${fileOut} /D="${workingDirectory}"`;
-                await vscode.window.withProgress({
-                    location: vscode.ProgressLocation.Window,
-                    title: "Running GenStat...",
-                }, async () => {
-                    await this.execPromise(cmd);
-                });
-            } catch (error) {
-                throw error;
-            } finally {
-                this._isRunning = false;
+        let workingDirectory = path.dirname(fileIn);
+        this.clearOutputFile(fileOut);
+        const cmd = `${pathGenBatch}`;
+        const args = [`IN=${fileIn}`, `${fileOut}`];
+        //const args = [`IN=${fileIn}`, `${fileOut}`, `/D=${workingDirectory}`];
+        this._genBatchHook = cp.spawn(cmd, args, {cwd: workingDirectory});
+        return this.promiseFromChildProcess(this._genBatchHook)
+            .then(
+                (code: any) => {
+                    console.log("success");
+                    this._genBatchHook = null;
+                    this._isRunning = false;
+                    if (code === null) {
+                        throw new Error("GenStat run aborted!");
+                    }
+                },
+                (err) => {
+                    console.log("error");
+                    this._genBatchHook = null;
+                    this._isRunning = false;
+                }
+            );
+    }
+
+    public abortRun() {
+        if (this._isRunning) {
+            if (this._genBatchHook) {
+                this._genBatchHook.kill('SIGKILL');
             }
+        }
+    }
+
+    private promiseFromChildProcess(child : cp.ChildProcess): Promise<void> {
+        return new Promise((resolve, reject) => {
+            child.addListener("error", reject);
+            child.addListener("exit", resolve);
+        });
+    }
+
+    private clearOutputFile(fileOut: string) {
+        if (fs.existsSync(fileOut)) {
+            fs.writeFileSync(fileOut, '');
         }
     }
 
@@ -45,17 +75,5 @@ export class GenStatRunner {
             throw new Error(`Error: Cannot find GenBatch.exe at ${pathGenBatch}!`);
         }
         return pathGenBatch;
-    }
-
-    private execPromise(command) {
-        return new Promise(function(resolve, reject) {
-            cp.exec(command, (error, stdout, stderr) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-                resolve(stdout.trim());
-            });
-        });
     }
 }

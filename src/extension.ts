@@ -1,26 +1,24 @@
 import * as vscode from 'vscode';
 import * as path from "path";
-
-const fs = require('fs');
+import * as fs from 'fs';
 
 import { ViewColumn } from 'vscode';
 import { OutputContentProvider } from './outputContentProvider';
-import { GenStatHelpProvider as GenStatHelpProvider } from './genstatHelpProvider';
+import { GenStatHelpProvider as GenStatHelpProvider } from './genStatHelpProvider';
 import { GenStatRunner } from './genStatRunner';
-import { VscodeSettings } from './vscodeSettings';
 import { GenStatOutputChannel } from './outputChannel';
 
 let genStatHelpProvider: GenStatHelpProvider;
 let genstatOutputContentProvider: OutputContentProvider;
 let genStatRunner: GenStatRunner;
 
-// method called when the extension is activated
-// the extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+let statusBarItem: vscode.StatusBarItem;
 
+export function activate(context: vscode.ExtensionContext) {
     genstatOutputContentProvider = new OutputContentProvider();
     genStatHelpProvider = new GenStatHelpProvider();
     genStatRunner = new GenStatRunner();
+    statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
 
     context.subscriptions.push(
         vscode.workspace.registerTextDocumentContentProvider('genstatOutput', genstatOutputContentProvider)
@@ -49,11 +47,9 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() { }
 
 async function runGenStat(): Promise<void> {
-
     const activeTextEditor = vscode.window.activeTextEditor;
     if (!activeTextEditor) {
         vscode.window.showInformationMessage(`Error: no GenStat file in active editor window!`);
-        delete this.status.compile;
         return;
     }
 
@@ -66,27 +62,43 @@ async function runGenStat(): Promise<void> {
 
     GenStatOutputChannel.start(`Running GenStat file ${filePath}`);
 
-    const pathGenBatch = VscodeSettings.getInstance().pathGenBatch;
-    if (!pathGenBatch) {
-        vscode.window.showInformationMessage(`Error: GenBatch path not specified!`);
-        delete this.status.compile;
+    if (genStatRunner.isRunning) {
+        let msg = `GenStat still running, cannot start another task!`;
+        GenStatOutputChannel.error(msg);
+        vscode.window.showErrorMessage(msg);
         return;
     }
 
     let timerStart = Date.now();
-    try {
-        await genStatRunner.runGenStat(filePath, outPath);
-        let timerStop = Date.now();
-        GenStatOutputChannel.end(`Run GenStat complete!`);
-        vscode.window.showInformationMessage(`Run GenStat completed! Duration: ${msToHMS(timerStop - timerStart)}.`);
-    } catch (ex) {
-        GenStatOutputChannel.error(`Run GenStat failed: ${ex.message}!`);
-        vscode.window.showErrorMessage(`${ex.message}`);
-    } finally {
-        if (fs.existsSync(outPath)) {
-            await showGenStatOutput(outPath);
-        }
-    }
+    vscode.window
+        .withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: `Running GenStat file ${path.basename(filePath)}`,
+            cancellable: true
+        }, (progress, token) => {
+            statusBarItem.text = `Running GenStat...`;
+            statusBarItem.show();
+            token.onCancellationRequested(() => {
+                genStatRunner.abortRun();
+            });
+            return genStatRunner.runGenStat(filePath, outPath);
+        })
+        .then(
+            () => {
+                let timerStop = Date.now();
+                GenStatOutputChannel.end(`Run GenStat complete!`);
+                vscode.window.showInformationMessage(`Run GenStat completed! Duration: ${msToHMS(timerStop - timerStart)}.`);
+                statusBarItem.hide();
+                if (fs.existsSync(outPath)) {
+                    showGenStatOutput(outPath);
+                }
+            },
+            (error) => {
+                GenStatOutputChannel.error(`Failed to start GenStat: ${error.message}!`);
+                vscode.window.showErrorMessage(`${error.message}`);
+                statusBarItem.hide();
+            }
+        );
 }
 
 async function switchToSource(): Promise<void> {

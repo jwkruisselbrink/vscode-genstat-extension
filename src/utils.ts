@@ -1,5 +1,5 @@
 import { TextDocument, Position } from "vscode";
-import { genstatKeywords } from "./genstatKeywords";
+import { genstatKeywords } from "./genStatKeywords";
 
 export function adjustWordPosition(document: TextDocument, position: Position): [boolean, string, Position] {
     let wordRange = document.getWordRangeAtPosition(position);
