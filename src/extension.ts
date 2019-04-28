@@ -113,7 +113,11 @@ async function switchToSource(): Promise<void> {
     let sourceDoc = vscode.workspace.textDocuments.find(doc => path.parse(doc.fileName).base === sourcePath);
     if (sourceDoc !== null) {
         let sourceTextEditor = vscode.window.visibleTextEditors.find(r => r.document === sourceDoc);
-        await vscode.window.showTextDocument(sourceDoc, { preview: false, viewColumn: sourceTextEditor.viewColumn, preserveFocus: false });
+        if (sourceTextEditor === undefined) {
+            await vscode.window.showTextDocument(sourceDoc, { preview: false, viewColumn: activeTextEditor.viewColumn, preserveFocus: false });
+        } else {
+            await vscode.window.showTextDocument(sourceDoc, { preview: false, viewColumn: sourceTextEditor.viewColumn, preserveFocus: false });
+        }
     } else if (fs.existsSync(sourcePath)) {
         vscode.workspace.openTextDocument(sourcePath).then(doc => {
             vscode.window.showTextDocument(doc);
