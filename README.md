@@ -6,11 +6,11 @@ Visual Studio Code extension for running GenStat scripts. Includes syntax highli
 
 ## Features
 
-* Run GenStat scripts (F12)
-* Open GenStat help (F11)
-* Syntax highlighting
+* Syntax highlighting for GenStat scripts and GenStat output.
+* Run GenStat scripts (F12).
+* Open GenStat help (F11).
+* Switch to GenStat source from GenStat output (Alt+F12).
 
 ### Supported platforms
 
 * Windows x64
-
