@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.0.5 (29-04-2019)
+
+- Fixed: link Biometris help links.
+- Fixed: correct auto-indentation for if/for blocks (#5).
+- Fixed: switch from GenStat output to source now also works in single-editor mode.
+- Added: syntax highlighting for GenStat output files (.lis files) (#6).
+- Changed: classify GenStat keywords as functions for syntax highlighting.
+- Changed: clear already existing .lis output files before running GenStat scripts (#13).
+- Changed: show message-box on running GenStat and allow for aborting jobs.
+
 ## 0.0.4 (26-04-2019)
 
 - Added: genstat output file language definition and association with .lis files.
