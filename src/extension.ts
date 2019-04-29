@@ -62,7 +62,7 @@ async function runGenStat(): Promise<void> {
 
     GenStatOutputChannel.start(`Running GenStat file ${filePath}`);
 
-    if (genStatRunner.isRunning) {
+    if (genStatRunner.isRunning()) {
         let msg = `GenStat still running, cannot start another task!`;
         GenStatOutputChannel.error(msg);
         vscode.window.showErrorMessage(msg);
@@ -86,8 +86,8 @@ async function runGenStat(): Promise<void> {
         .then(
             () => {
                 let timerStop = Date.now();
-                GenStatOutputChannel.end(`Run GenStat complete!`);
-                vscode.window.showInformationMessage(`Run GenStat completed! Duration: ${msToHMS(timerStop - timerStart)}.`);
+                GenStatOutputChannel.end(`GenStat run completed!`);
+                vscode.window.showInformationMessage(`GenStat run completed! Duration: ${msToHMS(timerStop - timerStart)}.`);
                 statusBarItem.hide();
                 if (fs.existsSync(outPath)) {
                     showGenStatOutput(outPath);

@@ -12,7 +12,7 @@ export class GenStatRunner {
     constructor() {
     }
 
-    public get isRunning(): boolean {
+    public isRunning(): boolean {
         return this._isRunning;
     }
 
@@ -26,12 +26,10 @@ export class GenStatRunner {
         this.clearOutputFile(fileOut);
         const cmd = `${pathGenBatch}`;
         const args = [`IN=${fileIn}`, `${fileOut}`];
-        //const args = [`IN=${fileIn}`, `${fileOut}`, `/D=${workingDirectory}`];
         this._genBatchHook = cp.spawn(cmd, args, {cwd: workingDirectory});
         return this.promiseFromChildProcess(this._genBatchHook)
             .then(
                 (code: any) => {
-                    console.log("success");
                     this._genBatchHook = null;
                     this._isRunning = false;
                     if (code === null) {
@@ -39,9 +37,9 @@ export class GenStatRunner {
                     }
                 },
                 (err) => {
-                    console.log("error");
                     this._genBatchHook = null;
                     this._isRunning = false;
+                    throw err;
                 }
             );
     }
