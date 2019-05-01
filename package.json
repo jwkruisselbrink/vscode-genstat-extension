@@ -49,8 +49,7 @@
                 "aliases": [
                     "lis",
                     "Lis"
-                ],
-                "configuration": "./languages/language-configuration.json"
+                ]
             }
         ],
         "grammars": [
