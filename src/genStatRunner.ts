@@ -20,6 +20,8 @@ export class GenStatRunner {
         if (this._isRunning) {
             throw new Error(`GenStat still running, cannot start another task!`);
         }
+        let lineLengthGen = VscodeSettings.getInstance().lineLengthGen;
+        let lineLengthLis = VscodeSettings.getInstance().lineLengthLis;
         this._isRunning = true;
         let pathGenBatch = this.getPathGenBatch();
         let workingDirectory = path.dirname(fileIn);
