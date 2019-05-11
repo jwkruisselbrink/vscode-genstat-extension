@@ -27,8 +27,13 @@ export class GenStatRunner {
         let workingDirectory = path.dirname(fileIn);
         this.clearOutputFile(fileOut);
         const cmd = `${pathGenBatch}`;
-        const args = [`IN=${fileIn}`, `${fileOut}`];
-        this._genBatchHook = cp.spawn(cmd, args, {cwd: workingDirectory});
+        const args = [
+            `IN=${fileIn}/${lineLengthGen}`,
+            `${fileOut}/${lineLengthLis}`
+        ];
+        this._genBatchHook = cp.spawn(cmd, args, {
+            cwd: workingDirectory,
+        });
         return this.promiseFromChildProcess(this._genBatchHook)
             .then(
                 (code: any) => {
