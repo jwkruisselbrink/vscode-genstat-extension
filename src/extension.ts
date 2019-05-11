@@ -60,10 +60,9 @@ async function runGenStat(): Promise<void> {
     const basename = path.basename(filePath, path.extname(filePath));
     const outPath = path.join(path.dirname(filePath), basename + ".lis");
 
-    GenStatOutputChannel.start(`Running GenStat file ${filePath}`);
-
+    GenStatOutputChannel.start(`Running GenStat file "${filePath}"`);
     if (genStatRunner.isRunning()) {
-        let msg = `GenStat still running, cannot start another task!`;
+        let msg = `GenStat still running, cannot start another task`;
         GenStatOutputChannel.error(msg);
         vscode.window.showErrorMessage(msg);
         return;
@@ -73,7 +72,7 @@ async function runGenStat(): Promise<void> {
     vscode.window
         .withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Running GenStat file ${path.basename(filePath)}`,
+            title: `Running GenStat file "${path.basename(filePath)}"`,
             cancellable: true
         }, (progress, token) => {
             statusBarItem.text = `Running GenStat...`;
@@ -85,18 +84,22 @@ async function runGenStat(): Promise<void> {
         })
         .then(
             () => {
-                let timerStop = Date.now();
-                GenStatOutputChannel.end(`GenStat run completed!`);
-                vscode.window.showInformationMessage(`GenStat run completed! Duration: ${msToHMS(timerStop - timerStart)}.`);
                 statusBarItem.hide();
+                let timerStop = Date.now();
+                let msg = `GenStat run completed! Duration: ${msToHMS(timerStop - timerStart)}.`;
+                GenStatOutputChannel.end(msg);
+                vscode.window.showInformationMessage(msg);
                 if (fs.existsSync(outPath)) {
                     showGenStatOutput(outPath);
                 }
             },
             (error) => {
-                GenStatOutputChannel.error(`Failed to start GenStat: ${error.message}!`);
-                vscode.window.showErrorMessage(`${error.message}`);
                 statusBarItem.hide();
+                GenStatOutputChannel.error(error);
+                vscode.window.showErrorMessage(error);
+                if (fs.existsSync(outPath)) {
+                    showGenStatOutput(outPath);
+                }
             }
         );
 }
