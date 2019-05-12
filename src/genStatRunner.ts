@@ -44,10 +44,10 @@ export class GenStatRunner {
                     return reject(`GenStat run cancelled`);
                 }
                 if (error) {
-                    return reject(`GenStat run failed (error code ${error.code})`);
+                    return reject(`GenStat run failed (error code ${error.code}).`);
                 }
                 if (stderr) {
-                    return reject(`GenStat run failed (error code ${error.code})`);
+                    return reject(`GenStat run failed (error code ${error.code}).`);
                 }
                 resolve(stdout);
             });

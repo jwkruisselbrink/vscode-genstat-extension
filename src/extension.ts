@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from "path";
 import * as fs from 'fs';
+import * as ncp from 'copy-paste';
 
 import { ViewColumn } from 'vscode';
 import { OutputContentProvider } from './outputContentProvider';
@@ -41,6 +42,12 @@ export function activate(context: vscode.ExtensionContext) {
             genStatHelpProvider.openGenStatHelpAtCurrentLocation();
         })
     );
+
+    context.subscriptions.push(
+        vscode.commands.registerTextEditorCommand('genstat.copyTable', () => {
+            copyTable();
+        })
+    );
 }
 
 // method called when the extension is deactivated
@@ -62,7 +69,7 @@ async function runGenStat(): Promise<void> {
 
     GenStatOutputChannel.start(`Running GenStat file "${filePath}"`);
     if (genStatRunner.isRunning()) {
-        let msg = `GenStat still running, cannot start another task`;
+        let msg = `GenStat still running, cannot start another task.`;
         GenStatOutputChannel.error(msg);
         vscode.window.showErrorMessage(msg);
         return;
@@ -137,7 +144,7 @@ async function showGenStatOutput(fileName: string): Promise<void> {
     const basename = path.basename(fileName);
     let uri = vscode.Uri.parse(`genstatOutput:${basename}`);
     let doc = await vscode.workspace.openTextDocument(uri);
-    const unique = (value, index, self) => { return self.indexOf(value) === index; }
+    const unique = (value, index, self) => { return self.indexOf(value) === index; };
     let viewColumns = vscode.window.visibleTextEditors.map(r => r.viewColumn).filter(unique);
     if (viewColumns.length > 1) {
         await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside, preserveFocus: false });
@@ -145,6 +152,28 @@ async function showGenStatOutput(fileName: string): Promise<void> {
         await vscode.window.showTextDocument(doc, { preview: false, viewColumn: viewColumns[0], preserveFocus: false });
     }
     genstatOutputContentProvider.onDidChangeEmitter.fire(uri);
+}
+
+function copyTable(): void {
+    // Get the active text editor
+    let editor = vscode.window.activeTextEditor;
+    if (editor) {
+        let document = editor.document;
+        let selection = editor.selection;
+        let word = document.getText(selection);
+
+        let lines = word
+            .split(/\r?\n/)
+            .map(line => {
+                return line.trimLeft().replace(/  +/g, ';');
+            })
+            .join("\n");
+
+        ncp.copy(lines, function () {
+            let msg = "Copied semicolon delimited string to clipboard!";
+            vscode.window.showInformationMessage(msg);
+        });
+    }
 }
 
 function msToHMS(ms : number): string {
