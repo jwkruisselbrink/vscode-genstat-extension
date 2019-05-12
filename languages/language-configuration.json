@@ -25,7 +25,7 @@
     ],
     "wordPattern": "(-?\\d*\\.\\d\\w*)|([^\\`\\~\\!\\@\\#\\%\\^\\&\\*\\(\\)\\-\\=\\+\\[\\{\\]\\}\\\\\\|\\;\\:\\'\\\"\\,\\.\\<\\>\\/\\?\\s]+)",
     "indentationRules": {
-        "increaseIndentPattern": "^\\s*(if|IF|for|FOR|elsif|ELSIF|else|ELSE).*$",
-        "decreaseIndentPattern": "^\\s*(endif|ENDIF|endfor|ENDFOR|elsif|ELSIF|else|ELSE).*$"
+        "increaseIndentPattern": "^\\s*(((i|I)(f|F))|((f|F)(o|O)(r|R))|((e|E)(l|L)(s|S)(e|E))|((e|E)(l|L)(s|S)(i|I)(f|F))).*$",
+        "decreaseIndentPattern": "^\\s*(((e|E)(n|N)(d|D)(i|I)(f|F))|((e|E)(n|N)(d|D)(f|F)(o|O)(r|R))|((e|E)(l|L)(s|S)(e|E))|((e|E)(l|L)(s|S)(i|I)(f|F))).*$"
     }
 }
