@@ -102,6 +102,11 @@
                 },
                 {
                     "command": "genstat.switchToSource",
+                    "when": "editorLangId == genstat",
+                    "group": "navigation"
+                },
+                {
+                    "command": "genstat.switchToSource",
                     "when": "editorLangId == genstat.output",
                     "group": "navigation"
                 }
@@ -120,7 +125,12 @@
             },
             {
                 "command": "genstat.switchToSource",
-                "key": "Alt+F12",
+                "key": "Alt+n",
+                "when": "editorTextFocus && editorLangId == genstat"
+            },
+            {
+                "command": "genstat.switchToSource",
+                "key": "Alt+n",
                 "when": "editorTextFocus && editorLangId == genstat.output"
             }
         ],

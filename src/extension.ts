@@ -32,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerTextEditorCommand('genstat.switchToSource', () => {
-            switchToSource();
+            switchSourceAndOutput();
         })
     );
 
@@ -104,25 +104,28 @@ async function runGenStat(): Promise<void> {
         );
 }
 
-async function switchToSource(): Promise<void> {
+async function switchSourceAndOutput(): Promise<void> {
     const activeTextEditor = vscode.window.activeTextEditor;
     if (!activeTextEditor) {
         return;
     }
     const wad = activeTextEditor.document;
-    const basename = path.basename(wad.fileName, path.extname(wad.fileName));
-    const sourcePath = path.join(path.dirname(wad.fileName), basename + ".gen");
 
-    let sourceDoc = vscode.workspace.textDocuments.find(doc => path.parse(doc.fileName).base === sourcePath);
-    if (sourceDoc !== null) {
+    let currentIsOutput = path.extname(wad.fileName) === '.lis';
+    const basename = path.basename(wad.fileName, path.extname(wad.fileName));
+
+    const switchToFilePath = path.join(path.dirname(wad.fileName), basename + (currentIsOutput ? ".gen" : ".lis"));
+    let switchToFileBase = path.basename(switchToFilePath);
+    let sourceDoc = vscode.workspace.textDocuments.find(doc => path.parse(doc.fileName).base === switchToFileBase);
+    if (sourceDoc !== null && sourceDoc !== undefined) {
         let sourceTextEditor = vscode.window.visibleTextEditors.find(r => r.document === sourceDoc);
         if (sourceTextEditor === undefined) {
-            await vscode.window.showTextDocument(sourceDoc, { preview: false, viewColumn: activeTextEditor.viewColumn, preserveFocus: false });
+            await vscode.window.showTextDocument(sourceDoc, { preview: true, viewColumn: activeTextEditor.viewColumn, preserveFocus: false });
         } else {
-            await vscode.window.showTextDocument(sourceDoc, { preview: false, viewColumn: sourceTextEditor.viewColumn, preserveFocus: false });
+            await vscode.window.showTextDocument(sourceDoc, { preview: true, viewColumn: sourceTextEditor.viewColumn, preserveFocus: false });
         }
-    } else if (fs.existsSync(sourcePath)) {
-        vscode.workspace.openTextDocument(sourcePath).then(doc => {
+    } else if (fs.existsSync(switchToFilePath)) {
+        vscode.workspace.openTextDocument(switchToFilePath).then(doc => {
             vscode.window.showTextDocument(doc);
          });
     } else {
