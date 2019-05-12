@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.0.6 (12-05-2019)
+
+- Fixed: language configuration: account for uppercase/lowercase if/for blocks (#15).
+- Fixed: Refactor GenStat runner to use exec (fixes problems with passing arguments with double quotes).
+- Added: Include configuration settings for line length of genstat commands and result lines of genstat outputs.
+- Added: functionality to switch to output option and change keybinding for switching between source and output to alt+n (#16).
+- Added: functionality to copy table in output as semicolon delimited string (#7).
+
 ## 0.0.5 (29-04-2019)
 
 - Fixed: link Biometris help links.
