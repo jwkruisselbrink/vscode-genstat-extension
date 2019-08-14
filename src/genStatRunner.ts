@@ -18,7 +18,7 @@ export class GenStatRunner {
         return this._isRunning;
     }
 
-    public runGenStat(fileIn, fileOut): Promise<void> {
+    public runGenStat(fileIn: string, fileOut: string): Promise<void> {
         if (this._isRunning) {
             throw new Error(`GenStat still running, cannot start another task!`);
         }
@@ -71,7 +71,7 @@ export class GenStatRunner {
         }
     }
 
-    private getPathGenBatch(): string {
+    public getPathGenBatch(): string {
         const pathGenBatch = VscodeSettings.getInstance().pathGenBatch;
         if (!pathGenBatch) {
             throw new Error(`Error: GenBatch path not specified!`);

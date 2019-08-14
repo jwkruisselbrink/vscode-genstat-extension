@@ -56,30 +56,40 @@ export function deactivate() { }
 async function runGenStat(): Promise<void> {
     const activeTextEditor = vscode.window.activeTextEditor;
     if (!activeTextEditor) {
-        vscode.window.showInformationMessage(`Error: no GenStat file in active editor window!`);
+        vscode.window.showInformationMessage(`Error: no GenStat file in active editor window.`);
         return;
     }
 
     const wad = activeTextEditor.document;
     const filePath = wad.fileName;
+    const viewColumn = vscode.window.activeTextEditor.viewColumn;
     await wad.save();
+
+    try {
+        genStatRunner.getPathGenBatch();
+    } catch (error) {
+        let msg = error.message;
+        GenStatOutputChannel.error(msg);
+        vscode.window.showErrorMessage(msg);
+        return;
+    }
 
     const basename = path.basename(filePath, path.extname(filePath));
     const outPath = path.join(path.dirname(filePath), basename + ".lis");
 
-    GenStatOutputChannel.start(`Running GenStat file "${filePath}"`);
     if (genStatRunner.isRunning()) {
         let msg = `GenStat still running, cannot start another task.`;
         GenStatOutputChannel.error(msg);
         vscode.window.showErrorMessage(msg);
         return;
     }
+    GenStatOutputChannel.start(`Running GenStat file "${filePath}".`);
 
     let timerStart = Date.now();
     vscode.window
         .withProgress({
             location: vscode.ProgressLocation.Notification,
-            title: `Running GenStat file "${path.basename(filePath)}"`,
+            title: `Running GenStat file "${path.basename(filePath)}".`,
             cancellable: true
         }, (progress, token) => {
             statusBarItem.text = `Running GenStat...`;
@@ -97,7 +107,7 @@ async function runGenStat(): Promise<void> {
                 GenStatOutputChannel.end(msg);
                 vscode.window.showInformationMessage(msg);
                 if (fs.existsSync(outPath)) {
-                    showGenStatOutput(outPath);
+                    showGenStatOutput(outPath, viewColumn);
                 }
             },
             (error) => {
@@ -105,7 +115,7 @@ async function runGenStat(): Promise<void> {
                 GenStatOutputChannel.error(error);
                 vscode.window.showErrorMessage(error);
                 if (fs.existsSync(outPath)) {
-                    showGenStatOutput(outPath);
+                    showGenStatOutput(outPath, viewColumn);
                 }
             }
         );
@@ -136,18 +146,19 @@ async function switchSourceAndOutput(): Promise<void> {
             vscode.window.showTextDocument(doc);
          });
     } else {
-        vscode.window.showErrorMessage(`Source file not found for this GenStat output file!`);
+        vscode.window.showErrorMessage(`Error: source file not found for this GenStat output file.`);
     }
 }
 
-async function showGenStatOutput(fileName: string): Promise<void> {
+async function showGenStatOutput(fileName: string, sourceViewColumn: ViewColumn): Promise<void> {
     const basename = path.basename(fileName);
     let uri = vscode.Uri.parse(`genstatOutput:${basename}`);
     let doc = await vscode.workspace.openTextDocument(uri);
     const unique = (value, index, self) => { return self.indexOf(value) === index; };
     let viewColumns = vscode.window.visibleTextEditors.map(r => r.viewColumn).filter(unique);
     if (viewColumns.length > 1) {
-        await vscode.window.showTextDocument(doc, { preview: false, viewColumn: ViewColumn.Beside, preserveFocus: false });
+        let vc = viewColumns.some(r => r > sourceViewColumn) ? viewColumns.find(r => r > sourceViewColumn) : sourceViewColumn - 1;
+        await vscode.window.showTextDocument(doc, { preview: false, viewColumn: vc, preserveFocus: false });
     } else {
         await vscode.window.showTextDocument(doc, { preview: false, viewColumn: viewColumns[0], preserveFocus: false });
     }
@@ -170,7 +181,7 @@ function copyTable(): void {
             .join("\n");
 
         ncp.copy(lines, function () {
-            let msg = "Copied semicolon delimited string to clipboard!";
+            let msg = "Copied semicolon delimited string to clipboard.";
             vscode.window.showInformationMessage(msg);
         });
     }
