@@ -11,14 +11,12 @@ import { GenStatOutputChannel } from './outputChannel';
 
 let genStatHelpProvider: GenStatHelpProvider;
 let genstatOutputContentProvider: OutputContentProvider;
-let genStatRunner: GenStatRunner;
 
 let statusBarItem: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
     genstatOutputContentProvider = new OutputContentProvider();
     genStatHelpProvider = new GenStatHelpProvider();
-    genStatRunner = new GenStatRunner();
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
 
     context.subscriptions.push(
@@ -65,6 +63,7 @@ async function runGenStat(): Promise<void> {
     const viewColumn = vscode.window.activeTextEditor.viewColumn;
     await wad.save();
 
+    let genStatRunner = new GenStatRunner();
     try {
         genStatRunner.getPathGenBatch();
     } catch (error) {
