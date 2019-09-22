@@ -107,7 +107,7 @@ async function runGenStat(): Promise<void> {
                 GenStatOutputChannel.end(msg);
                 vscode.window.showInformationMessage(msg);
                 if (fs.existsSync(outPath)) {
-                    showGenStatOutput(outPath, viewColumn);
+                    openOutputFile(outPath, viewColumn);
                 }
             },
             (error) => {
@@ -115,7 +115,7 @@ async function runGenStat(): Promise<void> {
                 GenStatOutputChannel.error(error);
                 vscode.window.showErrorMessage(error);
                 if (fs.existsSync(outPath)) {
-                    showGenStatOutput(outPath, viewColumn);
+                    openOutputFile(outPath, viewColumn);
                 }
             }
         );
@@ -163,6 +163,22 @@ async function showGenStatOutput(fileName: string, sourceViewColumn: ViewColumn)
         await vscode.window.showTextDocument(doc, { preview: false, viewColumn: viewColumns[0], preserveFocus: false });
     }
     genstatOutputContentProvider.onDidChangeEmitter.fire(uri);
+}
+
+async function openOutputFile(fileName: string, sourceViewColumn: vscode.ViewColumn): Promise<void> {
+    const basename = path.basename(fileName);
+    const unique = (value, index, self) => { return self.indexOf(value) === index; };
+    let viewColumns = vscode.window.visibleTextEditors.map(r => r.viewColumn).filter(unique);
+    if (viewColumns.length > 1) {
+        let vc = viewColumns.some(r => r > sourceViewColumn) ? viewColumns.find(r => r > sourceViewColumn) : sourceViewColumn - 1;
+        await vscode.workspace.openTextDocument(fileName).then(doc => {
+            vscode.window.showTextDocument(doc, { preview: false, viewColumn: vc, preserveFocus: false });
+        });
+    } else {
+        await vscode.workspace.openTextDocument(fileName).then(doc => {
+            vscode.window.showTextDocument(doc, { preview: false, viewColumn: viewColumns[0], preserveFocus: false });
+        });
+    }
 }
 
 function copyTable(): void {
