@@ -170,11 +170,6 @@
                     "default": "./AddIns/Biometris-19ed.chm",
                     "description": "Path to GenStat Biometris AddIn help file (including filename)"
                 },
-                "vsgenstat.line.length.genfile": {
-                    "type": "number",
-                    "default": 200,
-                    "description": "Line lenght GenStat commands in GenStat output files."
-                },
                 "vsgenstat.line.length.lisfile": {
                     "type": "number",
                     "default": 100,

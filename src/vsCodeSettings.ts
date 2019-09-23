@@ -5,7 +5,6 @@ const configKeys = {
     GENSTAT_PATH: "vsgenstat.path.genbatch",
     GENSTAT_HELP_PATH: "vsgenstat.path.genstat.help",
     BIOMETRIS_HELP_PATH: "vsgenstat.path.biometris.help",
-    LINE_LENGTH_GENFILE: "vsgenstat.line.length.genfile",
     LINE_LENGTH_LISFILE: "vsgenstat.line.length.lisfile"
 };
 
@@ -13,7 +12,6 @@ export interface IVscodeSettings {
     pathGenBatch: string;
     pathGenHelp: string;
     pathBiometrisHelp: string;
-    lineLengthGen: number;
     lineLengthGenOut: number;
 }
 
@@ -55,10 +53,6 @@ export class VscodeSettings implements IVscodeSettings {
             chmPath = path.normalize(path.join(pathGenStat, chmPath));
         }
         return chmPath;
-    }
-
-    public get lineLengthGen(): number {
-        return this.getConfigValue<number>(configKeys.LINE_LENGTH_GENFILE);
     }
 
     public get lineLengthGenOut(): number {
