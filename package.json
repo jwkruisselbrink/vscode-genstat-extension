@@ -103,8 +103,7 @@
                     "when": "editorHasReferenceProvider"
                 },
                 {
-                    "command": "genstat.copyTable",
-                    "when": "editorLangId == genstat.output"
+                    "command": "genstat.copyTable"
                 }
             ],
             "editor/title": [
@@ -149,7 +148,7 @@
             {
                 "command": "genstat.copyTable",
                 "key": "Ctrl+Shift+c",
-                "when": "editorTextFocus && editorLangId == genstat.output"
+                "when": "editorTextFocus"
             }
         ],
         "configuration": {
