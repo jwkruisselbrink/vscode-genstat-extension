@@ -151,7 +151,7 @@ async function switchSourceAndOutput(): Promise<void> {
             vscode.window.showTextDocument(doc);
          });
     } else {
-        vscode.window.showErrorMessage(`Error: source file not found for this GenStat output file.`);
+        vscode.window.showErrorMessage(`Error: source/output file not found for this GenStat file.`);
     }
 }
 
