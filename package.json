@@ -23,7 +23,8 @@
         "Other"
     ],
     "activationEvents": [
-        "onLanguage:genstat"
+        "onLanguage:genstat",
+        "onLanguage:genstat.output"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -32,21 +33,26 @@
                 "id": "genstat",
                 "extensions": [
                     ".gen",
-                    ".ex",
-                    ".pro"
+                    ".gpi",
+                    ".ex"
                 ],
                 "aliases": [
                     "gen",
-                    "Gen"
+                    "Gen",
+                    "gpi",
+                    "Gpi"
                 ],
                 "configuration": "./languages/language-configuration.json"
             },
             {
                 "id": "genstat.output",
                 "extensions": [
+                    ".Gout",
                     ".lis"
                 ],
                 "aliases": [
+                    "Gout",
+                    "gout",
                     "lis",
                     "Lis"
                 ]

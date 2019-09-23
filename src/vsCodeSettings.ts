@@ -14,7 +14,7 @@ export interface IVscodeSettings {
     pathGenHelp: string;
     pathBiometrisHelp: string;
     lineLengthGen: number;
-    lineLengthLis: number;
+    lineLengthGenOut: number;
 }
 
 export class VscodeSettings implements IVscodeSettings {
@@ -61,7 +61,7 @@ export class VscodeSettings implements IVscodeSettings {
         return this.getConfigValue<number>(configKeys.LINE_LENGTH_GENFILE);
     }
 
-    public get lineLengthLis(): number {
+    public get lineLengthGenOut(): number {
         return this.getConfigValue<number>(configKeys.LINE_LENGTH_LISFILE);
     }
 

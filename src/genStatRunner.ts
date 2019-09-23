@@ -23,7 +23,7 @@ export class GenStatRunner {
             throw new Error(`GenStat still running, cannot start another task!`);
         }
         let lineLengthGen = VscodeSettings.getInstance().lineLengthGen;
-        let lineLengthLis = VscodeSettings.getInstance().lineLengthLis;
+        let lineLengthGenOut = VscodeSettings.getInstance().lineLengthGenOut;
         this._isRunning = true;
         this._isAborted = false;
         let pathGenBatch = this.getPathGenBatch();
@@ -32,7 +32,7 @@ export class GenStatRunner {
         const cmd = `"${pathGenBatch}"`;
         const args = [
             `IN="${fileIn}"/${lineLengthGen}`,
-            `"${fileOut}"/${lineLengthLis}`,
+            `"${fileOut}"/${lineLengthGenOut}`,
             `/d="${workingDirectory}"`
         ];
         let execCmd = `${cmd} ${args.join(" ")}`;

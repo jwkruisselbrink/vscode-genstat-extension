@@ -9,6 +9,9 @@ import { GenStatHelpProvider as GenStatHelpProvider } from './genStatHelpProvide
 import { GenStatRunner } from './genStatRunner';
 import { GenStatOutputChannel } from './outputChannel';
 
+const inputFileExtensions: string[] = ['.gen', '.Gen', '.gpi', '.Gpi'];
+const outputFileExtensions: string[] = ['.Gout', '.gout', '.lis', '.Lis'];
+
 let genStatHelpProvider: GenStatHelpProvider;
 let genstatOutputContentProvider: OutputContentProvider;
 
@@ -74,7 +77,7 @@ async function runGenStat(): Promise<void> {
     }
 
     const basename = path.basename(filePath, path.extname(filePath));
-    const outPath = path.join(path.dirname(filePath), basename + ".lis");
+    const outPath = path.join(path.dirname(filePath), basename + ".Gout");
 
     if (genStatRunner.isRunning()) {
         let msg = `GenStat still running, cannot start another task.`;
@@ -126,13 +129,8 @@ async function switchSourceAndOutput(): Promise<void> {
         return;
     }
     const wad = activeTextEditor.document;
-
-    let currentIsOutput = path.extname(wad.fileName) === '.lis';
-    const basename = path.basename(wad.fileName, path.extname(wad.fileName));
-
-    const switchToFilePath = path.join(path.dirname(wad.fileName), basename + (currentIsOutput ? ".gen" : ".lis"));
-    let switchToFileBase = path.basename(switchToFilePath);
-    let sourceDoc = vscode.workspace.textDocuments.find(doc => path.parse(doc.fileName).base === switchToFileBase);
+    let switchToFilePath = findSwitchFile(wad.fileName);
+    let sourceDoc = vscode.workspace.textDocuments.find(doc => doc.fileName.toLowerCase() === switchToFilePath.toLowerCase());
     if (sourceDoc !== null && sourceDoc !== undefined) {
         let sourceTextEditor = vscode.window.visibleTextEditors.find(r => r.document === sourceDoc);
         if (sourceTextEditor === undefined) {
@@ -147,6 +145,18 @@ async function switchSourceAndOutput(): Promise<void> {
     } else {
         vscode.window.showErrorMessage(`Error: source file not found for this GenStat output file.`);
     }
+}
+
+function findSwitchFile(filename: string) {
+    let fileExt = path.extname(filename);
+    let switchExtensions = outputFileExtensions.some(r => r === fileExt) ? inputFileExtensions : outputFileExtensions;
+    for (var ext of switchExtensions) {
+        let switchFile = path.join(path.dirname(filename), `${path.basename(filename, fileExt)}${ext}`);
+        if (fs.existsSync(switchFile)) {
+            return switchFile;
+        }
+    }
+    return null; // not found!
 }
 
 async function showGenStatOutput(fileName: string, sourceViewColumn: ViewColumn): Promise<void> {
@@ -165,7 +175,6 @@ async function showGenStatOutput(fileName: string, sourceViewColumn: ViewColumn)
 }
 
 async function openOutputFile(fileName: string, sourceViewColumn: vscode.ViewColumn): Promise<void> {
-    const basename = path.basename(fileName);
     const unique = (value, index, self) => { return self.indexOf(value) === index; };
     let viewColumns = vscode.window.visibleTextEditors.map(r => r.viewColumn).filter(unique);
     if (viewColumns.length > 1) {
