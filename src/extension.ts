@@ -202,7 +202,8 @@ function copyTable(): void {
             .map(line => {
                 return line.trimLeft().replace(/  +/g, ';');
             })
-            .join("\n");
+            .join("\n")
+            .replace(/\n+/g, '\n');
 
         ncp.copy(lines, function () {
             let msg = "Copied semicolon delimited string to clipboard.";
