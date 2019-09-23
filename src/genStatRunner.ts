@@ -41,13 +41,13 @@ export class GenStatRunner {
                 this._genBatchHook = null;
                 this._isRunning = false;
                 if (this._isAborted) {
-                    return reject(`GenStat run cancelled`);
+                    return reject(-1);
                 }
                 if (error) {
-                    return reject(`GenStat run failed (error code ${error.code}).`);
+                    return reject(error.code);
                 }
                 if (stderr) {
-                    return reject(`GenStat run failed (error code ${error.code}).`);
+                    return reject(error.code);
                 }
                 resolve(stdout);
             });

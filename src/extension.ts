@@ -114,8 +114,16 @@ async function runGenStat(): Promise<void> {
             },
             (error) => {
                 statusBarItem.hide();
-                GenStatOutputChannel.error(error);
-                vscode.window.showErrorMessage(error);
+                let timerStop = Date.now();
+                if (error === 1) {
+                    let msg = `GenStat run completed with warnings! Duration: ${msToHMS(timerStop - timerStart)}.`;
+                    GenStatOutputChannel.warning(msg);
+                    vscode.window.showWarningMessage(msg);
+                } else {
+                    let msg = `GenStat run completed with errors! Duration: ${msToHMS(timerStop - timerStart)}.`;
+                    GenStatOutputChannel.error(msg);
+                    vscode.window.showErrorMessage(msg);
+                }
                 if (fs.existsSync(outPath)) {
                     openOutputFile(outPath, viewColumn);
                 }
