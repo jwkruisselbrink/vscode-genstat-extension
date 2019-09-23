@@ -3,7 +3,7 @@
     "displayName": "VSGenStat",
     "description": "GenStat extension for Visual Studio Code",
     "icon": "media/logo.png",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "publisher": "vsgenstat",
     "engines": {
         "vscode": "^1.31.0"

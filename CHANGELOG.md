@@ -1,5 +1,20 @@
 # Change Log
 
+## 0.0.7 (23-09-2019)
+
+- Fixed: add check for existence of GenBatch before running.
+- Changed: produced outputs are opened in an editable editor.
+- Changed: allow multiple simultaneous GenBatch runs.
+- Fixed: correct line comment symbol in language configuration.
+- Changed: add gpi as supported extension for source and remove pro extension association.
+- Changed: add Gout as default output file format.
+- Changed: update copy tables method to not include empty lines.
+- Changed: make copy tables command available for all languages.
+- Changed: include case and endcase as keywords in language configuration and syntax file.
+- Changed: update run duration string format.
+- Changed: update notifications after completed runs to distinguish between success/warnings/errors.
+- Changed: remove GenStat input line length option.
+
 ## 0.0.6 (12-05-2019)
 
 - Fixed: language configuration: account for uppercase/lowercase if/for blocks (#15).
