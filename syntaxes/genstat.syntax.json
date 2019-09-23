@@ -16,7 +16,7 @@
             "patterns": [
                 {
                     "name": "keyword.control.gen",
-                    "match": "^\\s*(?i)(for|endfor|if|endif)\\b"
+                    "match": "^\\s*(?i)(for|endfor|if|endif|case|endcase|or)\\b"
                 },
                 {
                     "name": "keyword.control.gen",
