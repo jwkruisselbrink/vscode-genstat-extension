@@ -79,12 +79,6 @@ async function runGenStat(): Promise<void> {
     const basename = path.basename(filePath, path.extname(filePath));
     const outPath = path.join(path.dirname(filePath), basename + ".Gout");
 
-    if (genStatRunner.isRunning()) {
-        let msg = `GenStat still running, cannot start another task.`;
-        GenStatOutputChannel.error(msg);
-        vscode.window.showErrorMessage(msg);
-        return;
-    }
     GenStatOutputChannel.start(`Running GenStat file "${filePath}".`);
 
     let timerStart = Date.now();
