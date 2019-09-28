@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.0.8 (28-09-2019)
+
+- Fixed: copy tables function now also works for block selections.
+- Fixed: add activation event for copy tables method so that it is available for all document types.
+- Changed: update format of script execution duration string.
+- Changed: completion/error messages now include script filenames.
+- Changed: is-running checks are removed; multiple simultaneous GenStat runs are allowed.
+
 ## 0.0.7 (23-09-2019)
 
 - Fixed: add check for existence of GenBatch before running.
