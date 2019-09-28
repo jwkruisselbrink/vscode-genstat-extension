@@ -24,7 +24,8 @@
     ],
     "activationEvents": [
         "onLanguage:genstat",
-        "onLanguage:genstat.output"
+        "onLanguage:genstat.output",
+        "onCommand:genstat.copyTable"
     ],
     "main": "./out/extension.js",
     "contributes": {
