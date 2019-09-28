@@ -202,10 +202,12 @@ function copyTable(): void {
     let editor = vscode.window.activeTextEditor;
     if (editor) {
         let document = editor.document;
-        let selection = editor.selection;
-        let word = document.getText(selection);
+        let words = editor.selections
+            .sort((a, b) => (a.start.line > b.start.line) ? 1 : -1)
+            .map(r => document.getText(r))
+            .join("\r\n");
 
-        let lines = word
+        let lines = words
             .split(/\r?\n/)
             .map(line => {
                 return line.trimLeft().replace(/  +/g, ';');
