@@ -230,10 +230,14 @@ function msToHMS(ms) {
     seconds = seconds % 60;
     let roundSec = Math.trunc(seconds);
     let milliSec = Math.round(10 * (seconds - roundSec));
-    let hm = zeroPad(hours, 2) + ":" + zeroPad(minutes, 2);
+    let hm = zeroPad(minutes, 2);
+    if (hours > 0) {
+        hm = zeroPad(hours, 2) + ":" + zeroPad(minutes, 2);
+    }
     let sec = zeroPad(roundSec, 2) + "." + milliSec;
     return hm + ":" + sec;
 }
+
 function zeroPad(num, places) {
     var zero = places - num.toString().length + 1;
     return Array(+(zero > 0 && zero)).join("0") + num;
